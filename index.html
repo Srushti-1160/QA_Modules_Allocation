@@ -135,6 +135,7 @@ tr.subrow .grip{margin-left:-6px}
 .mren{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:6px;margin-left:6px;cursor:pointer;padding:0;vertical-align:-6px;display:inline-grid;place-items:center;opacity:0}
 tr:hover .mren,.mren:focus-visible{opacity:1}
 .mren:hover{background:var(--listth);color:var(--ink)}
+.mren.mdel:hover{background:var(--c-nd-bg);color:var(--c-nd)}
 .mren:focus-visible{outline:2px solid var(--c-prog);outline-offset:2px}
 @media (hover:none){.mren{opacity:1}}
 .tog:focus-visible{outline:2px solid var(--c-prog);outline-offset:2px}
@@ -338,7 +339,7 @@ const KEY="uat-6410-alloc-v1";
 const SERVER=/*__STATE__*/null;
 const ONLINE=!!SERVER;
 const UI_KEYS=["collapsed","view","plat","sideClosed","off"];
-const SHARED_DOC=["builds","custom","added","layout","nest","features","unmatched","seeded","fvis","names"];
+const SHARED_DOC=["builds","custom","added","layout","nest","features","unmatched","seeded","fvis","names","removed"];
 let saved={status:{},custom:[],added:{},collapsed:{},features:[],unmatched:[],seeded:false};
 try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(ONLINE){UI_KEYS.forEach(k=>{if(o[k]!==undefined)saved[k]=o[k];});}else saved=Object.assign(saved,o);}}catch(e){}
 if(ONLINE){Object.assign(saved,SERVER.doc||{});saved.status=SERVER.status||{};saved.bstatus=SERVER.bstatus||{};saved.notes=SERVER.notes||{};}
@@ -392,6 +393,8 @@ DATA.forEach(p=>(saved.added[p.key]||[]).forEach(x=>p.main.push({id:x.id,m:x.m,a
 DATA.forEach(p=>["main","mon"].forEach(sec=>p[sec].forEach(r=>{
  r.id=r.id||(p.key+"|"+sec+"|"+(r.sub?(r.kind==="feature"?"feature:":r.kind==="tab"?"tab:":r.kind==="notif"?"notif:":r.kind==="part"?"part:":"master:"):"")+r.m);r.person=p.key;r.sec=sec;
  r.a0=r.a||"";r.w0=r.w||"";r.t0=r.t||"";r.m0=r.m;ALLROWS.push(r);})));
+// Rows the team removed stay removed.
+if(saved.removed&&saved.removed.length){const gone=new Set(saved.removed);DATA.forEach(p=>["main","mon"].forEach(sec=>{p[sec]=p[sec].filter(r=>!gone.has(r.id));}));for(let i=ALLROWS.length-1;i>=0;i--)if(gone.has(ALLROWS[i].id))ALLROWS.splice(i,1);}
 {const SH=["Sowmya","Srushti"];const paths=k=>{const p=DATA.find(x=>x.key===k);const m=new Map();let par="";p.main.forEach(r=>{if(!r.sub)par=norm(r.m);const pth=r.sub?par+"|"+(r.kind||"master")+":"+norm(r.m):par;if(!m.has(pth))m.set(pth,r);});return m;};
  const A=paths(SH[0]),B=paths(SH[1]);
  A.forEach((ra,pth)=>{const rb=B.get(pth);if(!rb)return;const sk="ss:"+pth;
@@ -450,8 +453,30 @@ const isFeat=r=>r.kind==="feature"||r.kind==="bug";
 const featKey=r=>r.uf?r.skey:"sf:"+norm(r.m0||r.m);
 function parentName(r){if(!r.sub)return "";const arr=DATA.find(p=>p.key===r.person)[r.sec];for(let i=arr.indexOf(r)-1;i>=0;i--)if(!arr[i].sub)return arr[i].m;return "";}
 // Rename a row everywhere the same item appears (the same module can be listed under several people).
-function renameRow(r,v){const old=r.m;if(!v||v===old)return;const par=norm(parentName(r));
- const same=ALLROWS.filter(x=>!x.editing&&norm(x.m)===norm(old)&&!!x.sub===!!r.sub&&(!r.sub||((x.kind||"")===(r.kind||"")&&norm(parentName(x))===par)));
+// The same item listed under several people (same name, level, kind and parent).
+function sameRows(r){const par=norm(parentName(r));return ALLROWS.filter(x=>!x.editing&&norm(x.m)===norm(r.m)&&!!x.sub===!!r.sub&&(!r.sub||((x.kind||"")===(r.kind||"")&&norm(parentName(x))===par)));}
+// Remove rows for good: a module takes its items with it.
+// dropFeatures: also delete new-feature / bug-fix records (only when no copy of their module is left).
+function removeRows(rows,dropFeatures){const drop=new Set();
+ rows.forEach(r=>{drop.add(r);if(!r.sub){const arr=DATA.find(p=>p.key===r.person)[r.sec];for(let j=arr.indexOf(r)+1;arr[j]&&arr[j].sub;j++)drop.add(arr[j]);}});
+ saved.removed=saved.removed||[];const featIds=new Set();
+ drop.forEach(x=>{if(x.uf){if(dropFeatures){const f=saved.features.find(f=>"uf:"+f.id===x.skey);if(f)featIds.add(f.id);}return;}
+  if(!saved.removed.includes(x.id))saved.removed.push(x.id);
+  if(String(x.id).startsWith("added:")&&saved.added[x.person])saved.added[x.person]=saved.added[x.person].filter(a=>a.id!==x.id);
+  delete saved.notes[x.id];delete saved.collapsed[x.id];});
+ if(featIds.size)saved.features=saved.features.filter(f=>!featIds.has(f.id));
+ DATA.forEach(p=>["main","mon"].forEach(sec=>{p[sec]=p[sec].filter(x=>!drop.has(x)&&!(x.uf&&featIds.has(x.skey.slice(3))));}));
+ for(let i=ALLROWS.length-1;i>=0;i--){const x=ALLROWS[i];if(drop.has(x)||(x.uf&&featIds.has(x.skey.slice(3))))ALLROWS.splice(i,1);}
+ saveLayout();render();}
+function askRemove(r){const all=sameRows(r);const others=[...new Set(all.filter(x=>x.person!==r.person).map(x=>DATA.find(p=>p.key===x.person).name))];
+ const arr=DATA.find(p=>p.key===r.person)[r.sec];let kids=0;if(!r.sub)for(let j=arr.indexOf(r)+1;arr[j]&&arr[j].sub;j++)kids++;
+ const me=DATA.find(p=>p.key===r.person).name;
+ const what=`“${r.m}”`+(kids?` and the ${kids} ${kids===1?"item":"items"} under it`:"");
+ const shared=r.uf;// a new feature / bug fix is one record shown under every copy of its module
+ if(!others.length||shared){askChoice({title:r.sub?"Remove item":"Remove module",text:`Remove ${what}${others.length?` (also listed under ${others.join(", ")})`:""}? Its statuses and notes go with it. This can’t be undone.`,yes:"Remove",no:null}).then(v=>{if(v)removeRows(shared?all:[r],true);});return;}
+ askChoice({title:r.sub?"Remove item":"Remove module",text:`Remove ${what}? It is also listed under ${others.join(", ")}. This can’t be undone.`,yes:"Remove everywhere",no:`Only from ${me}`}).then(v=>{if(v===null)return;removeRows(v?all:[r],v);});}
+function renameRow(r,v){const old=r.m;if(!v||v===old)return;
+ const same=sameRows(r);
  saved.names=saved.names||{};
  same.forEach(x=>{if(x.uf){const f=saved.features.find(f=>"uf:"+f.id===x.skey);if(f)f.m=v;}
   else if(v===x.m0)delete saved.names[x.id];else saved.names[x.id]=v;x.m=v;});
@@ -512,11 +537,12 @@ function tableHTML(rows,pk){let par=null;const out=[];const showA=P()!=="web",sh
   const shut=has&&saved.collapsed[r.id];
   const cls=r.sub?("subrow"+(nx&&nx.sub?"":" last")):(has&&!shut?"hassub":"");
   const tog=has?`<button class="tog" data-tog="${esc(r.id)}" aria-expanded="${!shut}" aria-label="${shut?"Show":"Hide"} items under ${esc(r.m)}" title="${shut?"Show":"Hide"}">${shut?"▸":"▾"}</button>`:"";
-  out.push(`<tr class="${cls}" data-id="${esc(r.id)}" data-person="${esc(r.person)}" data-sec="${r.sec}"><td class="mod">${r.editing?`<div class="nwrap"><input class="newmod" data-id="${esc(r.id)}" ${r.sub?"":`placeholder="Module name" `}aria-label="${r.sub?`New item under ${esc(parentName(r))}`:"Module name"}"><button type="button" class="nsend newsave" aria-label="Save" title="Save"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:`<span class="grip" draggable="true" data-drag="${esc(r.id)}" title="Drag to another person" aria-hidden="true">⠿</span>`+(r.sub?((r.kind in TAG)?TAG[r.kind]:`<span class="mtag">Master</span>`):"")+esc(r.m)+`<button type="button" class="mren" data-ren="${esc(r.id)}" aria-label="Rename ${esc(r.m)}" title="Rename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>`+(r.sub?"":`<button type="button" class="addsub" data-addsub="${esc(r.id)}" aria-label="Add under ${esc(r.m)}" title="Add under ${esc(r.m)}">+</button>`)+tog}</td>${showA?`<td class="st">${selectHTML(r,"a")}</td>`:""}${showW?`<td class="st">${selectHTML(r,"w")}</td>`:""}${showT?`<td class="tb">${r.editing?"":`<button type="button" class="tbedit" data-tb="${esc(r.id)}" aria-label="Edit tested by for ${esc(r.m)}" title="Edit tested by">${r.t&&r.t!=="—"?esc(r.t):`<span class="tbadd">Add name</span>`}</button>`}</td>`:""}${showN?`<td class="nt">${ed&&!r.editing?`<div class="nwrap"><input class="noteinp" data-nid="${esc(nkey(r))}" value="${esc(noteOf(r))}" placeholder="Add a note" aria-label="Note for ${esc(r.m)}"><button class="nsend" aria-label="Save note for ${esc(r.m)}" title="Save note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:esc(noteOf(r))}</td>`:""}</tr>`);});
+  out.push(`<tr class="${cls}" data-id="${esc(r.id)}" data-person="${esc(r.person)}" data-sec="${r.sec}"><td class="mod">${r.editing?`<div class="nwrap"><input class="newmod" data-id="${esc(r.id)}" ${r.sub?"":`placeholder="Module name" `}aria-label="${r.sub?`New item under ${esc(parentName(r))}`:"Module name"}"><button type="button" class="nsend newsave" aria-label="Save" title="Save"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:`<span class="grip" draggable="true" data-drag="${esc(r.id)}" title="Drag to another person" aria-hidden="true">⠿</span>`+(r.sub?((r.kind in TAG)?TAG[r.kind]:`<span class="mtag">Master</span>`):"")+esc(r.m)+`<button type="button" class="mren" data-ren="${esc(r.id)}" aria-label="Rename ${esc(r.m)}" title="Rename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>`+(r.sub?"":`<button type="button" class="addsub" data-addsub="${esc(r.id)}" aria-label="Add under ${esc(r.m)}" title="Add under ${esc(r.m)}">+</button>`)+`<button type="button" class="mren mdel" data-del="${esc(r.id)}" aria-label="Remove ${esc(r.m)}" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg></button>`+tog}</td>${showA?`<td class="st">${selectHTML(r,"a")}</td>`:""}${showW?`<td class="st">${selectHTML(r,"w")}</td>`:""}${showT?`<td class="tb">${r.editing?"":`<button type="button" class="tbedit" data-tb="${esc(r.id)}" aria-label="Edit tested by for ${esc(r.m)}" title="Edit tested by">${r.t&&r.t!=="—"?esc(r.t):`<span class="tbadd">Add name</span>`}</button>`}</td>`:""}${showN?`<td class="nt">${ed&&!r.editing?`<div class="nwrap"><input class="noteinp" data-nid="${esc(nkey(r))}" value="${esc(noteOf(r))}" placeholder="Add a note" aria-label="Note for ${esc(r.m)}"><button class="nsend" aria-label="Save note for ${esc(r.m)}" title="Save note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:esc(noteOf(r))}</td>`:""}</tr>`);});
  return `<div class="tbl"><table><thead><tr><th>Module</th>${showA?"<th>App status</th>":""}${showW?"<th>Web status</th>":""}${showT?"<th>Tested by</th>":""}${showN?"<th>Notes</th>":""}</tr></thead><tbody>${out.join("")}</tbody></table></div>`;}
 function cnt(m,mo){const a=[...m,...mo].filter(onPlat);const c=k=>a.filter(r=>r.sub&&(k==="master"?!r.kind:r.kind===k)).length;const w=(n,one,many)=>n?`, ${n} ${n===1?one:many}`:"";const mods=a.filter(r=>!r.sub).length;
  return `${mods} ${mods===1?"module":"modules"}`+w(c("master"),"master","masters")+w(c("report"),"report","reports")+w(c("feature"),"new feature","new features")+w(c("bug"),"bug fix","bug fixes")+w(c("tab"),"tab","tabs")+w(c("notif"),"notification","notifications");}
-function unmatchedHTML(){if(!saved.unmatched.length||state.person!=="__all")return "";
+// Unmatched items only carry an App status, so they are not part of the Web view.
+function unmatchedHTML(){if(!saved.unmatched.length||state.person!=="__all"||P()==="web")return "";
  const mods=moduleNames();
  return `<section class="card"><h3>Not matched to a module <small>${saved.unmatched.length} ${saved.unmatched.length===1?"item":"items"}</small></h3>
  <p class="none">Pick a module and the item moves under it.</p><div class="tbl"><table><thead><tr><th>Item</th><th>App status</th>${P()==="web"?"":"<th>Tested by</th>"}<th>Move to module</th></tr></thead><tbody>${
@@ -556,6 +582,7 @@ document.addEventListener("click",e=>{
  if(stMenu&&!e.target.closest(".stmenu"))closeStMenu();
  const tbb=e.target.closest(".tbedit");if(tbb){const r=ALLROWS.find(x=>x.id===tbb.dataset.tb);const B=curBuild();if(!r||!B)return;
   askText({title:"Tested by",label:`Who tested ${r.m}?`,value:r.t==="—"?"":(r.t||""),ok:"Save",allowEmpty:true}).then(v=>{if(v===null)return;const k=r.skey||r.id;const store=bstore(B);store[k]=Object.assign(store[k]||{},{t:v});persist();render();});return;}
+ const rmv=e.target.closest(".mdel");if(rmv){const r=ALLROWS.find(x=>x.id===rmv.dataset.del);if(r)askRemove(r);return;}
  const rn=e.target.closest(".mren");if(rn){const r=ALLROWS.find(x=>x.id===rn.dataset.ren);if(!r)return;
   askText({title:r.sub?"Rename item":"Rename module",label:r.sub?"Name":"Module name",value:r.m,ok:"Save",
    check:v=>!r.sub&&norm(v)!==norm(r.m)&&ALLROWS.some(x=>!x.sub&&!x.editing&&norm(x.m)===norm(v))?"A module with that name already exists.":null})
@@ -705,7 +732,7 @@ function newBuild(){const t=saved.view.track;const sk=stageKey();const L0=saved.
   if(!keys.length){finish(false);return;}
   askChoice({title:"New features & bug fixes",text:`The current build has ${keys.length} new feature${keys.length===1?"":"s"} / bug fix${keys.length===1?"":"es"}. Do you want to keep them in ${n}?`,yes:"Keep them",no:"Remove them"}).then(finish);});}
 function askChoice({title,text,yes,no}){return new Promise(res=>{const d=document.getElementById("chDlg");document.getElementById("chTitle").textContent=title;document.getElementById("chText").textContent=text;
- const y=document.getElementById("chYes"),nb=document.getElementById("chNo"),c=document.getElementById("chCancel");y.textContent=yes;nb.textContent=no;
+ const y=document.getElementById("chYes"),nb=document.getElementById("chNo"),c=document.getElementById("chCancel");y.textContent=yes;nb.textContent=no||"";nb.hidden=!no;
  const done=v=>{d.close();y.removeEventListener("click",fy);nb.removeEventListener("click",fn);c.removeEventListener("click",fc);d.removeEventListener("cancel",fc);res(v);};
  const fy=()=>done(true),fn=()=>done(false),fc=e=>{if(e)e.preventDefault();done(null);};
  y.addEventListener("click",fy);nb.addEventListener("click",fn);c.addEventListener("click",fc);d.addEventListener("cancel",fc);d.showModal();y.focus();});}
