@@ -142,6 +142,16 @@ tr:hover .mren,.mren:focus-visible{opacity:1}
 .mtag.ntag{color:var(--c-pend);background:var(--c-pend-bg)}
 .mtag.ttag{color:var(--c-nn);background:var(--c-nn-bg)}
 .mtag.ftag{color:var(--c-ne);background:var(--c-ne-bg)}
+.mtag.btag{color:var(--c-nd);background:var(--c-nd-bg)}
+.addsub{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:6px;margin-left:2px;cursor:pointer;padding:0;vertical-align:-6px;display:inline-grid;place-items:center;opacity:0;font:inherit;font-size:17px;line-height:1}
+tr:hover .addsub,.addsub:focus-visible{opacity:1}
+.addsub:hover{background:var(--listth);color:var(--ink)}
+.addsub:focus-visible{outline:2px solid var(--c-prog);outline-offset:2px}
+@media (hover:none){.addsub{opacity:1}}
+tr.subrow input.newmod{font-weight:500}
+.pvtype{font:inherit;font-size:13px;font-weight:600;padding:6px 8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+.pvtype.bug{color:var(--c-nd);background:var(--c-nd-bg);border-color:transparent}
+.pvtype.feature{color:var(--c-ne);background:var(--c-ne-bg);border-color:transparent}
 .btn.primary{background:var(--sel);color:#fff;border-color:transparent}
 .btn:disabled{opacity:.6;cursor:default}
 .chip{display:inline-block;font-size:13px;font-weight:600;border-radius:999px;padding:5px 12px}
@@ -166,7 +176,8 @@ dialog#imp>div{padding:0 26px}
 table.pv{min-width:0}
 table.pv th{position:sticky;top:0;background:var(--surface)}
 table.pv td{padding:8px 10px}
-table.pv th:first-child,table.pv td:first-child{width:52%}
+table.pv th:first-child,table.pv td:first-child{width:44%}
+table.pv th:nth-child(2),table.pv td:nth-child(2){width:132px}
 table.pv th:last-child,table.pv td:last-child{width:40px}
 .pv select{width:100%}
 .pvname{width:100%;font:inherit;font-size:14px;border:1px solid transparent;border-radius:8px;padding:6px 8px;background:transparent;color:var(--ink)}
@@ -283,7 +294,7 @@ dialog#chDlg::backdrop{background:rgba(15,35,40,.45)}
 <div class="tools">
 <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
 <input id="q" type="search" placeholder="Search module or tester…" aria-label="Search"></label>
-<button class="btn primary" id="addf">Add new features</button>
+<button class="btn primary" id="addf">Add features &amp; bug fixes</button>
 <span id="syncMsg" class="syncmsg" role="status" aria-live="polite"></span>
 </div>
 <div class="layout">
@@ -292,17 +303,17 @@ dialog#chDlg::backdrop{background:rgba(15,35,40,.45)}
 </div>
 </div>
 <dialog id="imp" aria-labelledby="impTitle">
-<div class="dhead"><h2 id="impTitle">Add new features</h2><button class="x" id="impClose" aria-label="Close">×</button></div>
+<div class="dhead"><h2 id="impTitle">Add new features &amp; bug fixes</h2><button class="x" id="impClose" aria-label="Close">×</button></div>
 <div id="step1">
 <label class="drop"><input type="file" id="impFile" accept=".xlsx,.xls,.csv,.docx,.txt"><b>Upload Excel or Word</b><span id="fileName">No file chosen</span></label>
 <label class="lbl" for="impText">Or paste the list</label>
-<textarea id="impText" rows="8" placeholder="One feature per line"></textarea>
+<textarea id="impText" rows="8" placeholder="One new feature or bug fix per line, e.g.&#10;Hospital – discharge summary PDF&#10;Fix: Pharmacy invoice total wrong"></textarea>
 <p id="impMsg" class="impmsg" role="status"></p>
 <div class="dfoot"><button class="btn primary" id="impSort">Sort into modules</button></div>
 </div>
 <div id="step2" hidden>
 <p id="pvSum" class="pvsum"></p>
-<div class="pvwrap"><table class="pv"><thead><tr><th>New feature</th><th>Module</th><th></th></tr></thead><tbody id="pvBody"></tbody></table></div>
+<div class="pvwrap"><table class="pv"><thead><tr><th>Item</th><th>Type</th><th>Module</th><th></th></tr></thead><tbody id="pvBody"></tbody></table></div>
 <div class="dfoot"><button class="btn" id="impBack">Back</button><button class="btn primary" id="impAdd">Add features</button></div>
 </div>
 </dialog>
@@ -398,7 +409,7 @@ function insertFeatures(){
   DATA.forEach(p=>["main","mon"].forEach(sec=>{const L=p[sec];
    for(let i=0;i<L.length;i++){const r=L[i];if(r.sub||r.editing||norm(r.m)!==norm(f.module))continue;
     let j=i+1;while(j<L.length&&L[j].sub)j++;
-    const row={id:`uf:${f.id}:${p.key}:${sec}`,skey:sk,a0:f.a||"",w0:"",t0:f.t||"",m:f.m,a:st.a!==undefined?st.a:(f.a||""),w:st.w!==undefined?st.w:"",t:f.t||"",sub:true,kind:"feature",uf:true,person:p.key,sec};
+    const row={id:`uf:${f.id}:${p.key}:${sec}`,skey:sk,a0:f.a||"",w0:"",t0:f.t||"",m:f.m,a:st.a!==undefined?st.a:(f.a||""),w:st.w!==undefined?st.w:"",t:f.t||"",sub:true,kind:f.type==="bug"?"bug":"feature",uf:true,person:p.key,sec};
     L.splice(j,0,row);ALLROWS.push(row);i=j;}}));});}
 function removeFeatures(){DATA.forEach(p=>["main","mon"].forEach(sec=>{p[sec]=p[sec].filter(r=>!r.uf);}));for(let i=ALLROWS.length-1;i>=0;i--)if(ALLROWS[i].uf)ALLROWS.splice(i,1);}
 (saved.nest?Object.entries(saved.nest):[]).forEach(([id,v])=>{const r=ALLROWS.find(x=>x.id===id);if(r){r.sub=!!v.sub;r.kind=v.kind||undefined;}});
@@ -408,7 +419,7 @@ function reorderByLayout(){if(!saved.layout)return;DATA.forEach(p=>{const L=save
  const placed=arr.filter(r=>pos.has(r.id)).sort((a,b)=>pos.get(a.id)-pos.get(b.id));const out=[...placed];
  arr.forEach((r,i)=>{if(pos.has(r.id))return;let prev=null;for(let k=i-1;k>=0;k--){if(out.includes(arr[k])){prev=arr[k];break;}}const at=prev?out.indexOf(prev)+1:0;let j=at;while(prev&&!r.sub&&out[j]&&out[j].sub)j++;out.splice(j,0,r);});
  p[sec]=out;});});}
-function saveLayout(){saved.layout={};DATA.forEach(p=>saved.layout[p.key]={main:p.main.filter(r=>!r.editing).map(r=>r.id),mon:p.mon.map(r=>r.id)});persist();}
+function saveLayout(){saved.layout={};DATA.forEach(p=>saved.layout[p.key]={main:p.main.filter(r=>!r.editing).map(r=>r.id),mon:p.mon.filter(r=>!r.editing).map(r=>r.id)});persist();}
 function setNest(r,sub){r.sub=sub;if(sub&&!r.kind)r.kind="part";saved.nest=saved.nest||{};saved.nest[r.id]={sub:r.sub,kind:r.kind||""};}
 function moveRow(id,toKey,toSec,beforeId,mode){const r=ALLROWS.find(x=>x.id===id);if(!r||r.editing)return;const from=DATA.find(p=>p.key===r.person);const arr=from[r.sec];
  const i=arr.indexOf(r);let n=1;if(!r.sub){while(arr[i+n]&&arr[i+n].sub)n++;}
@@ -434,6 +445,7 @@ const nkey=r=>r.id;const noteOf=r=>saved.notes[nkey(r)]||"";
 const hay=r=>[r.m,r.t,r.a,r.w,noteOf(r)].join(" ").toLowerCase();
 function statusFor(r,B){const st=((B===SEED?saved.status:saved.bstatus[B])||{})[r.skey||r.id]||{};const a0=B===SEED?r.a0:resetV(r.a0),w0=B===SEED?r.w0:resetV(r.w0);return {a:st.a!==undefined?st.a:(a0||""),w:st.w!==undefined?st.w:(w0||""),t:st.t!==undefined?st.t:(B===SEED?(r.t0||""):"")};}
 function applyBuild(){const B=curBuild();ALLROWS.forEach(r=>{if(r.editing)return;const s=B?statusFor(r,B):{a:"",w:"",t:""};r.a=s.a;r.w=s.w;r.t=s.t;});}
+const isFeat=r=>r.kind==="feature"||r.kind==="bug";
 const featKey=r=>r.uf?r.skey:"sf:"+norm(r.m0||r.m);
 function parentName(r){if(!r.sub)return "";const arr=DATA.find(p=>p.key===r.person)[r.sec];for(let i=arr.indexOf(r)-1;i>=0;i--)if(!arr[i].sub)return arr[i].m;return "";}
 // Rename a row everywhere the same item appears (the same module can be listed under several people).
@@ -445,7 +457,7 @@ function renameRow(r,v){const old=r.m;if(!v||v===old)return;const par=norm(paren
  if(!r.sub)saved.features.forEach(f=>{if(norm(f.module)===norm(old))f.module=v;});
  persist();render();}
 function featVisible(r,B){if(!B)return true;const L=(saved.fvis||{})[B];if(L)return L.includes(featKey(r));if(r.uf){const f=saved.features.find(x=>"uf:"+x.id===r.skey);return !f||!f.build||f.build===B;}return true;}
-function markOff(track,B){const off={};DATA.forEach(p=>["main","mon"].forEach(sec=>{let par=null;p[sec].forEach(r=>{if(!r.sub)par=norm(r.m);r.off=!!off[par]||(r.kind==="feature"&&!!B&&!featVisible(r,B));});}));}
+function markOff(track,B){const off={};DATA.forEach(p=>["main","mon"].forEach(sec=>{let par=null;p[sec].forEach(r=>{if(!r.sub)par=norm(r.m);r.off=!!off[par]||(isFeat(r)&&!!B&&!featVisible(r,B));});}));}
 function calcFor(B,pl,track){markOff(track,B);const g=new Map(),out=new Set();
  DATA.forEach(p=>["main","mon"].forEach(sec=>{let cur=null;p[sec].forEach(r=>{if(r.editing||r.off)return;const s=statusFor(r,B);const f=(pl==="app"?[s.a]:pl==="web"?[s.w]:[s.a,s.w]).filter(Boolean);
   if(!r.sub){cur=null;if(!f.length)return;const k=norm(r.m);if(f.some(x=>EXC.includes(x))){out.add(k);return;}cur=k;if(!g.has(k))g.set(k,true);if(!f.every(x=>x==="Completed"))g.set(k,false);}
@@ -488,22 +500,22 @@ document.addEventListener("keydown",e=>{if(!stMenu)return;const items=[...stMenu
  else if(e.key==="End"){e.preventDefault();items[items.length-1].focus();}});
 window.addEventListener("scroll",e=>{if(stMenu&&e.target!==stMenu.m)closeStMenu();},true);
 window.addEventListener("resize",()=>closeStMenu());
-const TAG={part:"",notif:`<span class="mtag ntag">Notification</span>`,tab:`<span class="mtag ttag">Tab</span>`,report:`<span class="mtag rtag">Report</span>`,feature:`<span class="mtag ftag">New feature</span>`};
+const TAG={part:"",notif:`<span class="mtag ntag">Notification</span>`,tab:`<span class="mtag ttag">Tab</span>`,report:`<span class="mtag rtag">Report</span>`,feature:`<span class="mtag ftag">New feature</span>`,bug:`<span class="mtag btag">Bug fix</span>`};
 function tableHTML(rows,pk){let par=null;const out=[];const showA=P()!=="web",showW=P()!=="app";const ed=noteEdit.has(pk);const showN=ed||rows.some(r=>noteOf(r));
  rows.forEach((r,i)=>{if(!r.sub)par=r;const nx=rows[i+1];const has=!r.sub&&nx&&nx.sub;
   if(r.sub&&par&&saved.collapsed[par.id])return;
   const shut=has&&saved.collapsed[r.id];
   const cls=r.sub?("subrow"+(nx&&nx.sub?"":" last")):(has&&!shut?"hassub":"");
   const tog=has?`<button class="tog" data-tog="${esc(r.id)}" aria-expanded="${!shut}" aria-label="${shut?"Show":"Hide"} items under ${esc(r.m)}" title="${shut?"Show":"Hide"}">${shut?"▸":"▾"}</button>`:"";
-  out.push(`<tr class="${cls}" data-id="${esc(r.id)}" data-person="${esc(r.person)}" data-sec="${r.sec}"><td class="mod">${r.editing?`<input class="newmod" data-id="${esc(r.id)}" placeholder="Module name" aria-label="Module name">`:`<span class="grip" draggable="true" data-drag="${esc(r.id)}" title="Drag to another person" aria-hidden="true">⠿</span>`+(r.sub?((r.kind in TAG)?TAG[r.kind]:`<span class="mtag">Master</span>`):"")+esc(r.m)+`<button type="button" class="mren" data-ren="${esc(r.id)}" aria-label="Rename ${esc(r.m)}" title="Rename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>`+tog}</td>${showA?`<td class="st">${selectHTML(r,"a")}</td>`:""}${showW?`<td class="st">${selectHTML(r,"w")}</td>`:""}<td class="tb">${r.editing?"":`<button type="button" class="tbedit" data-tb="${esc(r.id)}" aria-label="Edit tested by for ${esc(r.m)}" title="Edit tested by">${r.t&&r.t!=="—"?esc(r.t):`<span class="tbadd">Add name</span>`}</button>`}</td>${showN?`<td class="nt">${ed&&!r.editing?`<div class="nwrap"><input class="noteinp" data-nid="${esc(nkey(r))}" value="${esc(noteOf(r))}" placeholder="Add a note" aria-label="Note for ${esc(r.m)}"><button class="nsend" aria-label="Save note for ${esc(r.m)}" title="Save note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:esc(noteOf(r))}</td>`:""}</tr>`);});
+  out.push(`<tr class="${cls}" data-id="${esc(r.id)}" data-person="${esc(r.person)}" data-sec="${r.sec}"><td class="mod">${r.editing?`<input class="newmod" data-id="${esc(r.id)}" placeholder="${r.sub?"Sub-module name":"Module name"}" aria-label="${r.sub?"Sub-module name":"Module name"}">`:`<span class="grip" draggable="true" data-drag="${esc(r.id)}" title="Drag to another person" aria-hidden="true">⠿</span>`+(r.sub?((r.kind in TAG)?TAG[r.kind]:`<span class="mtag">Master</span>`):"")+esc(r.m)+`<button type="button" class="mren" data-ren="${esc(r.id)}" aria-label="Rename ${esc(r.m)}" title="Rename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>`+(r.sub?"":`<button type="button" class="addsub" data-addsub="${esc(r.id)}" aria-label="Add sub-module under ${esc(r.m)}" title="Add sub-module">+</button>`)+tog}</td>${showA?`<td class="st">${selectHTML(r,"a")}</td>`:""}${showW?`<td class="st">${selectHTML(r,"w")}</td>`:""}<td class="tb">${r.editing?"":`<button type="button" class="tbedit" data-tb="${esc(r.id)}" aria-label="Edit tested by for ${esc(r.m)}" title="Edit tested by">${r.t&&r.t!=="—"?esc(r.t):`<span class="tbadd">Add name</span>`}</button>`}</td>${showN?`<td class="nt">${ed&&!r.editing?`<div class="nwrap"><input class="noteinp" data-nid="${esc(nkey(r))}" value="${esc(noteOf(r))}" placeholder="Add a note" aria-label="Note for ${esc(r.m)}"><button class="nsend" aria-label="Save note for ${esc(r.m)}" title="Save note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:esc(noteOf(r))}</td>`:""}</tr>`);});
  return `<div class="tbl"><table><thead><tr><th>Module</th>${showA?"<th>App status</th>":""}${showW?"<th>Web status</th>":""}<th>Tested by</th>${showN?"<th>Notes</th>":""}</tr></thead><tbody>${out.join("")}</tbody></table></div>`;}
 function cnt(m,mo){const a=[...m,...mo].filter(onPlat);const c=k=>a.filter(r=>r.sub&&(k==="master"?!r.kind:r.kind===k)).length;const w=(n,one,many)=>n?`, ${n} ${n===1?one:many}`:"";const mods=a.filter(r=>!r.sub).length;
- return `${mods} ${mods===1?"module":"modules"}`+w(c("master"),"master","masters")+w(c("report"),"report","reports")+w(c("feature"),"new feature","new features")+w(c("tab"),"tab","tabs")+w(c("part"),"sub-module","sub-modules")+w(c("notif"),"notification","notifications");}
+ return `${mods} ${mods===1?"module":"modules"}`+w(c("master"),"master","masters")+w(c("report"),"report","reports")+w(c("feature"),"new feature","new features")+w(c("bug"),"bug fix","bug fixes")+w(c("tab"),"tab","tabs")+w(c("part"),"sub-module","sub-modules")+w(c("notif"),"notification","notifications");}
 function unmatchedHTML(){if(!saved.unmatched.length||state.person!=="__all")return "";
  const mods=moduleNames();
- return `<section class="card"><h3>Not matched to a module <small>${saved.unmatched.length} new features</small></h3>
- <p class="none">Pick a module and the feature moves under it.</p><div class="tbl"><table><thead><tr><th>New feature</th><th>App status</th><th>Tested by</th><th>Move to module</th></tr></thead><tbody>${
- saved.unmatched.map(u=>`<tr><td class="mod"><span class="mtag ftag">New feature</span>${esc(u.m)}</td><td class="st">${u.a?`<span class="chip" style="${cssVars(u.a)}">${esc(u.a)}</span>`:""}</td><td class="tb">${esc(u.t)}</td><td><select class="assign" data-u="${esc(u.id)}" aria-label="Module for ${esc(u.m)}"><option value="">Choose module</option>${mods.map(x=>`<option value="${esc(x.name)}">${esc(x.name)} (${esc([...x.people].join(", "))})</option>`).join("")}</select></td></tr>`).join("")}</tbody></table></div></section>`;}
+ return `<section class="card"><h3>Not matched to a module <small>${saved.unmatched.length} ${saved.unmatched.length===1?"item":"items"}</small></h3>
+ <p class="none">Pick a module and the item moves under it.</p><div class="tbl"><table><thead><tr><th>Item</th><th>App status</th><th>Tested by</th><th>Move to module</th></tr></thead><tbody>${
+ saved.unmatched.map(u=>`<tr><td class="mod">${u.type==="bug"?TAG.bug:TAG.feature}${esc(u.m)}</td><td class="st">${u.a?`<span class="chip" style="${cssVars(u.a)}">${esc(u.a)}</span>`:""}</td><td class="tb">${esc(u.t)}</td><td><select class="assign" data-u="${esc(u.id)}" aria-label="Module for ${esc(u.m)}"><option value="">Choose module</option>${mods.map(x=>`<option value="${esc(x.name)}">${esc(x.name)} (${esc([...x.people].join(", "))})</option>`).join("")}</select></td></tr>`).join("")}</tbody></table></div></section>`;}
 function render(){
  applyBuild();markOff(saved.view.track,curBuild());
  const vis=ALLROWS.filter(r=>match(r)&&onPlat(r));
@@ -547,6 +559,7 @@ document.addEventListener("click",e=>{
  const sg=e.target.closest(".segb");if(sg){saved.plat=sg.dataset.plat;persist();render();return;}
  const stg=e.target.closest(".sidetog");if(stg){saved.sideClosed=!saved.sideClosed;persist();render();return;}
  const tg=e.target.closest(".tog");if(tg){const id=tg.dataset.tog;if(saved.collapsed[id])delete saved.collapsed[id];else saved.collapsed[id]=true;persist();render();return;}
+ const asb=e.target.closest(".addsub");if(asb){addSubRow(asb.dataset.addsub);return;}
  const ab=e.target.closest(".addbtn");if(ab){const key=ab.dataset.add;const p=DATA.find(x=>x.key===key);
   const r={id:"added:"+key+":"+Date.now(),m:"",a:"",w:"",t:"",person:key,sec:"main",editing:true};p.main.push(r);ALLROWS.push(r);render();
   const inp=document.querySelector(`input.newmod[data-id="${r.id}"]`);if(inp)inp.focus();return;}
@@ -555,7 +568,7 @@ document.addEventListener("click",e=>{
 });
 document.getElementById("main").addEventListener("change",e=>{
  const as=e.target.closest("select.assign");if(as){if(!as.value)return;const i=saved.unmatched.findIndex(u=>u.id===as.dataset.u);if(i<0)return;
-  const u=saved.unmatched.splice(i,1)[0];{const B=curBuild();saved.features.push({id:u.id,m:u.m,module:as.value,a:u.a||"",t:u.t||"",build:B});if(B&&saved.fvis&&saved.fvis[B])saved.fvis[B].push("uf:"+u.id);}persist();removeFeatures();insertFeatures();reorderByLayout();render();return;}
+  const u=saved.unmatched.splice(i,1)[0];{const B=curBuild();saved.features.push({id:u.id,m:u.m,module:as.value,a:u.a||"",t:u.t||"",type:u.type||"feature",build:B});if(B&&saved.fvis&&saved.fvis[B])saved.fvis[B].push("uf:"+u.id);}persist();removeFeatures();insertFeatures();reorderByLayout();render();return;}
 });
 let dragId=null;
 function clearOver(){document.querySelectorAll(".over,.nest,.afterln").forEach(x=>x.classList.remove("over","nest","afterln"));}
@@ -569,10 +582,16 @@ document.addEventListener("drop",e=>{if(!dragId)return;const t=dropTarget(e.targ
  else if(t.matches(".card"))moveRow(id,t.dataset.person,"main",null);
  else moveRow(id,t.dataset.p,"main",null);});
 document.addEventListener("dragend",()=>{dragId=null;clearOver();document.querySelectorAll(".dragging").forEach(x=>x.classList.remove("dragging"));});
+// Add an editable sub-module row directly under a module (after its existing children).
+function addSubRow(parentId){const par=ALLROWS.find(x=>x.id===parentId);if(!par||par.sub)return;const arr=DATA.find(p=>p.key===par.person)[par.sec];
+ let j=arr.indexOf(par)+1;while(arr[j]&&arr[j].sub)j++;
+ const r={id:"added:"+par.person+":"+Date.now(),m:"",a:"",w:"",t:"",person:par.person,sec:par.sec,sub:true,kind:"part",editing:true};
+ arr.splice(j,0,r);ALLROWS.push(r);if(saved.collapsed[par.id]){delete saved.collapsed[par.id];persist();}render();
+ const inp=document.querySelector(`input.newmod[data-id="${r.id}"]`);if(inp)inp.focus();}
 function finish(inp,keep){const r=ALLROWS.find(x=>x.id===inp.dataset.id);if(!r||!r.editing)return;const v=inp.value.trim();
  const p=DATA.find(x=>x.key===r.person);
- if(keep&&v){r.m=v;delete r.editing;(saved.added[r.person]=saved.added[r.person]||[]).push({id:r.id,m:v});persist();saveLayout();}
- else{p.main.splice(p.main.indexOf(r),1);ALLROWS.splice(ALLROWS.indexOf(r),1);}
+ if(keep&&v){r.m=v;r.m0=v;delete r.editing;if(r.sub)setNest(r,true);(saved.added[r.person]=saved.added[r.person]||[]).push({id:r.id,m:v});persist();saveLayout();}
+ else{const L=p[r.sec];L.splice(L.indexOf(r),1);ALLROWS.splice(ALLROWS.indexOf(r),1);}
  render();}
 document.getElementById("main").addEventListener("keydown",e=>{const i=e.target.closest("input.newmod");if(!i)return;
  if(e.key==="Enter"){e.preventDefault();finish(i,true);}else if(e.key==="Escape"){finish(i,false);}});
@@ -608,20 +627,22 @@ function guess(lines,mods){const names=mods.map(m=>m.name);const byLow=new Map(n
   if(!best){for(const [k,v] of ALIAS){if(low.includes(k)&&byLow.has(norm(v))){best=byLow.get(norm(v));break;}}}
   const st=statuses().find(s=>low.includes(s.toLowerCase()))||"";
   let feat=l;if(st)feat=feat.replace(new RegExp(st.replace(/[-]/g,"\\-"),"i"),"");feat=feat.split("|").map(x=>x.trim()).filter(Boolean).filter(x=>!statuses().some(s=>norm(s)===norm(x)))[0]||l;
-  return {m:feat.trim(),module:best||"",a:st,t:""};});}
+  return {m:stripBug(feat.trim()),module:best||"",a:st,t:"",type:isBugText(l)?"bug":"feature"};});}
+const isBugText=l=>/\b(bug|bugs|fix|fixes|fixed|issue|defect|crash|crashes|error|broken|not working|incorrect|wrong)\b/i.test(l);
+const stripBug=l=>l.replace(/^\s*(bug\s*fix|bug|fix(ed)?)\s*[:\-–]\s*/i,"").trim()||l;
 async function aiSort(lines,mods){const sample=await getSample();if(!sample)return null;
  const modList=mods.map(m=>m.name);
- const prompt=`You sort feature lines from a UAT test list into the modules of a zoo and animal-care management app (ANTZ).
+ const prompt=`You sort new-feature and bug-fix lines from a UAT test list into the modules of a zoo and animal-care management app (ANTZ).
 Allowed modules (use the exact spelling): ${JSON.stringify(modList)}.
 Allowed statuses: ${JSON.stringify(statuses())}.
 Lines (each may be a row of spreadsheet cells joined with " | "):
 ${JSON.stringify(lines.map((l,i)=>({line:i,text:l})))}
 Return ONLY a JSON array. One object per real feature, in line order:
-{"line": number, "feature": "short feature name in the user's own words, without status words or tester names", "module": "one allowed module, or null if no module clearly fits", "status": "one allowed status if the line states it, else empty string", "testedBy": "tester names if the line states them, else empty string"}
-Skip headings, column titles, release numbers and lines that are not features.`;
+{"line": number, "type": "bug" if the line describes a bug fix, defect, issue or error being fixed, otherwise "feature", "feature": "short name in the user's own words, without status words, tester names or a leading 'Bug fix:' label", "module": "one allowed module, or null if no module clearly fits", "status": "one allowed status if the line states it, else empty string", "testedBy": "tester names if the line states them, else empty string"}
+Skip headings, column titles, release numbers and lines that are not features or bug fixes.`;
  const out=await sample.json(prompt,{modelTier:"default"});
  if(!Array.isArray(out))return null;const low=new Map(modList.map(n=>[norm(n),n]));const sts=statuses();
- return out.filter(o=>o&&o.feature).map(o=>({m:String(o.feature).trim(),module:low.get(norm(o.module))||"",a:sts.find(s=>norm(s)===norm(o.status))||"",t:String(o.testedBy||"").trim()}));}
+ return out.filter(o=>o&&o.feature).map(o=>({m:String(o.feature).trim(),module:low.get(norm(o.module))||"",a:sts.find(s=>norm(s)===norm(o.status))||"",t:String(o.testedBy||"").trim(),type:o.type==="bug"?"bug":"feature"}));}
 document.getElementById("impSort").addEventListener("click",async()=>{
  const btn=document.getElementById("impSort");msg("");
  try{let lines=[];const f=document.getElementById("impFile").files[0];
@@ -640,18 +661,20 @@ document.getElementById("impSort").addEventListener("click",async()=>{
 });
 function renderPreview(mods){mods=mods||moduleNames();
  const n=preview.filter(p=>p.module).length;
- document.getElementById("pvSum").textContent=`${preview.length} features found. ${n} matched to a module${preview.length-n?`, ${preview.length-n} not matched`:""}.`;
- document.getElementById("pvBody").innerHTML=preview.map(p=>`<tr data-pv="${esc(p.id)}"><td><input class="pvname" value="${esc(p.m)}" aria-label="Feature name"></td><td><select class="pvmod" aria-label="Module for ${esc(p.m)}"><option value="">Not matched</option>${mods.map(x=>`<option value="${esc(x.name)}"${x.name===p.module?" selected":""}>${esc(x.name)} (${esc([...x.people].join(", "))})</option>`).join("")}</select></td><td><button class="pvdel" aria-label="Remove ${esc(p.m)}" title="Remove">×</button></td></tr>`).join("");
- document.getElementById("impAdd").textContent=`Add ${preview.length} features`;
+ const nb=preview.filter(p=>p.type==="bug").length,nf=preview.length-nb;const pl=(k,a,b)=>`${k} ${k===1?a:b}`;
+ document.getElementById("pvSum").textContent=`${pl(nf,"new feature","new features")} and ${pl(nb,"bug fix","bug fixes")} found. ${n} matched to a module${preview.length-n?`, ${preview.length-n} not matched`:""}.`;
+ document.getElementById("pvBody").innerHTML=preview.map(p=>`<tr data-pv="${esc(p.id)}"><td><input class="pvname" value="${esc(p.m)}" aria-label="Item name"></td><td><select class="pvtype ${p.type==="bug"?"bug":"feature"}" aria-label="Type for ${esc(p.m)}"><option value="feature"${p.type==="bug"?"":" selected"}>New feature</option><option value="bug"${p.type==="bug"?" selected":""}>Bug fix</option></select></td><td><select class="pvmod" aria-label="Module for ${esc(p.m)}"><option value="">Not matched</option>${mods.map(x=>`<option value="${esc(x.name)}"${x.name===p.module?" selected":""}>${esc(x.name)} (${esc([...x.people].join(", "))})</option>`).join("")}</select></td><td><button class="pvdel" aria-label="Remove ${esc(p.m)}" title="Remove">×</button></td></tr>`).join("");
+ document.getElementById("impAdd").textContent=`Add ${preview.length} ${preview.length===1?"item":"items"}`;
  document.getElementById("impAdd").disabled=!preview.length;}
 document.getElementById("pvBody").addEventListener("input",e=>{const tr=e.target.closest("tr");const p=preview.find(x=>x.id===tr.dataset.pv);if(!p)return;
  if(e.target.classList.contains("pvname"))p.m=e.target.value;});
 document.getElementById("pvBody").addEventListener("change",e=>{const tr=e.target.closest("tr");const p=preview.find(x=>x.id===tr.dataset.pv);if(!p)return;
- if(e.target.classList.contains("pvmod")){p.module=e.target.value;renderPreview();}});
+ if(e.target.classList.contains("pvmod")){p.module=e.target.value;renderPreview();}
+ if(e.target.classList.contains("pvtype")){p.type=e.target.value;renderPreview();}});
 document.getElementById("pvBody").addEventListener("click",e=>{const b=e.target.closest(".pvdel");if(!b)return;const id=b.closest("tr").dataset.pv;preview=preview.filter(x=>x.id!==id);renderPreview();});
 document.getElementById("impBack").addEventListener("click",()=>setStep(1));
 document.getElementById("impAdd").addEventListener("click",()=>{
- preview.filter(p=>p.m.trim()).forEach(p=>{const it={id:p.id,m:p.m.trim(),a:p.a||"",t:p.t||""};
+ preview.filter(p=>p.m.trim()).forEach(p=>{const it={id:p.id,m:p.m.trim(),a:p.a||"",t:p.t||"",type:p.type==="bug"?"bug":"feature"};
   if(p.module){const B=curBuild();saved.features.push({...it,module:p.module,build:B});if(B&&saved.fvis&&saved.fvis[B])saved.fvis[B].push("uf:"+it.id);}else saved.unmatched.push(it);});
  persist();removeFeatures();insertFeatures();reorderByLayout();render();dlg.close();});
 function guessName(){const t=saved.view.track,s=saved.view.stage[t];const L=saved.builds[stageKey()]||[];const inc=n=>{const m=/^(.*)\((\d+)\)\s*$/.exec(n);return m?`${m[1]}(${+m[2]+1})`:n+" (2)";};
@@ -668,10 +691,10 @@ function askText({title,label,value="",ok="Save",check,allowEmpty}){return new P
 function newBuild(){const t=saved.view.track;const sk=stageKey();const L0=saved.builds[sk]||[];
  askText({title:"Add new build",label:`Build number for ${TRACKS[t].label} › ${stageLabel()}`,value:guessName(),ok:"Add build",check:n=>L0.includes(n)?"That build already exists in this stage.":null}).then(n=>{if(!n)return;
   const tk=saved.view.track;const src=curBuild()||(()=>{const f=tk+"|"+TRACKS[tk].stages[0][0];const X=saved.builds[f]||[];return X.length?f+"|"+X[X.length-1]:null;})();
-  const keys=[...new Set(ALLROWS.filter(r=>r.kind==="feature"&&featVisible(r,src)).map(featKey))];
+  const keys=[...new Set(ALLROWS.filter(r=>isFeat(r)&&featVisible(r,src)).map(featKey))];
   const finish=keep=>{if(keep===null)return;const L=saved.builds[sk]=saved.builds[sk]||[];L.push(n);const nb=sk+"|"+n;saved.view.build[sk]=n;saved.bstatus[nb]={};saved.fvis=saved.fvis||{};saved.fvis[nb]=keep?keys:[];persist();render();};
   if(!keys.length){finish(false);return;}
-  askChoice({title:"New features",text:`The current build has ${keys.length} new feature${keys.length===1?"":"s"}. Do you want to keep the new features tree in ${n}?`,yes:"Keep new features",no:"Remove them"}).then(finish);});}
+  askChoice({title:"New features & bug fixes",text:`The current build has ${keys.length} new feature${keys.length===1?"":"s"} / bug fix${keys.length===1?"":"es"}. Do you want to keep them in ${n}?`,yes:"Keep them",no:"Remove them"}).then(finish);});}
 function askChoice({title,text,yes,no}){return new Promise(res=>{const d=document.getElementById("chDlg");document.getElementById("chTitle").textContent=title;document.getElementById("chText").textContent=text;
  const y=document.getElementById("chYes"),nb=document.getElementById("chNo"),c=document.getElementById("chCancel");y.textContent=yes;nb.textContent=no;
  const done=v=>{d.close();y.removeEventListener("click",fy);nb.removeEventListener("click",fn);c.removeEventListener("click",fc);d.removeEventListener("cancel",fc);res(v);};
