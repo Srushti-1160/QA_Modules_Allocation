@@ -4,7 +4,8 @@
   "description": "UAT Module Allocation Dashboard with shared PostgreSQL storage",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node dev.mjs"
   },
   "engines": {
     "node": ">=18"
@@ -12,5 +13,8 @@
   "dependencies": {
     "express": "^4.19.2",
     "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "embedded-postgres": "17.12.0-beta.19"
   }
 }
