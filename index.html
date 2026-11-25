@@ -78,6 +78,23 @@ td.st{width:17%}
 select.s{appearance:none;-webkit-appearance:none;font:inherit;font-size:13px;font-weight:600;border:1px dashed var(--line);border-radius:999px;padding:5px 26px 5px 12px;cursor:pointer;background-color:transparent;color:var(--muted);
 background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23889' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;max-width:100%}
 select.s.has{border-style:solid;border-color:transparent}
+.stbtn{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:600;border:1px dashed var(--line);border-radius:999px;padding:5px 10px 5px 12px;cursor:pointer;background:transparent;color:var(--muted);max-width:100%;white-space:nowrap}
+.stbtn.has{border:1px solid transparent}
+.stbtn i{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.stbtn svg{opacity:.7;flex:none}
+.stbtn:hover{border-style:solid;border-color:color-mix(in srgb,currentColor 40%,transparent)}
+.stbtn[aria-expanded="true"]{box-shadow:0 0 0 2px var(--c-prog)}
+.stbtn:focus-visible{outline:2px solid var(--c-prog);outline-offset:2px}
+.stmenu{position:fixed;z-index:50;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px;min-width:210px;max-height:min(380px,70vh);overflow:auto;box-shadow:0 18px 40px rgba(30,50,40,.18)}
+.stopt{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;font:inherit;font-size:14px;font-weight:500;color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer;text-align:left}
+.stopt i{width:9px;height:9px;border-radius:50%;flex:none}
+.stopt b{margin-left:auto;color:var(--c-done);font-weight:800}
+.stopt:hover,.stopt:focus-visible{background:#f1eee6;outline:none}
+.stopt:focus-visible{box-shadow:inset 0 0 0 2px var(--c-prog)}
+.stopt[aria-selected="true"]{font-weight:700}
+.stopt.add{color:var(--c-prog);font-weight:600}
+.stopt.muted{color:var(--muted)}
+.stsep{height:1px;background:var(--line);margin:6px 4px}
 select.s:focus-visible,.btn:focus-visible,.pill:focus-visible,.side button:focus-visible,.search input:focus-visible{outline:2px solid var(--c-prog);outline-offset:2px}
 .mtag{display:inline-block;font-size:11px;font-weight:700;color:var(--c-x);background:var(--c-x-bg);border-radius:6px;padding:1px 7px;margin-right:8px;vertical-align:1px}
 .hbtns{margin-left:auto;align-self:center;display:flex;gap:8px}
@@ -115,6 +132,11 @@ tr.subrow td.mod::after{content:"";position:absolute;left:20px;top:17px;width:16
 tr.subrow .grip{margin-left:-6px}
 .tog{border:0;background:var(--listth);color:var(--muted);width:22px;height:22px;border-radius:6px;margin-left:8px;cursor:pointer;font-size:12px;line-height:22px;padding:0;vertical-align:1px}
 .tog:hover{color:var(--ink)}
+.mren{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:6px;margin-left:6px;cursor:pointer;padding:0;vertical-align:-6px;display:inline-grid;place-items:center;opacity:0}
+tr:hover .mren,.mren:focus-visible{opacity:1}
+.mren:hover{background:var(--listth);color:var(--ink)}
+.mren:focus-visible{outline:2px solid var(--c-prog);outline-offset:2px}
+@media (hover:none){.mren{opacity:1}}
 .tog:focus-visible{outline:2px solid var(--c-prog);outline-offset:2px}
 .mtag.ptag{color:#2f6f8f;background:#e2eff5}
 .mtag.ntag{color:var(--c-pend);background:var(--c-pend-bg)}
@@ -305,7 +327,7 @@ const KEY="uat-6410-alloc-v1";
 const SERVER=/*__STATE__*/null;
 const ONLINE=!!SERVER;
 const UI_KEYS=["collapsed","view","plat","sideClosed","off"];
-const SHARED_DOC=["builds","custom","added","layout","nest","features","unmatched","seeded","fvis"];
+const SHARED_DOC=["builds","custom","added","layout","nest","features","unmatched","seeded","fvis","names"];
 let saved={status:{},custom:[],added:{},collapsed:{},features:[],unmatched:[],seeded:false};
 try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(ONLINE){UI_KEYS.forEach(k=>{if(o[k]!==undefined)saved[k]=o[k];});}else saved=Object.assign(saved,o);}}catch(e){}
 if(ONLINE){Object.assign(saved,SERVER.doc||{});saved.status=SERVER.status||{};saved.bstatus=SERVER.bstatus||{};saved.notes=SERVER.notes||{};}
@@ -358,13 +380,15 @@ const ALLROWS=[];
 DATA.forEach(p=>(saved.added[p.key]||[]).forEach(x=>p.main.push({id:x.id,m:x.m,a:"",w:"",t:""})));
 DATA.forEach(p=>["main","mon"].forEach(sec=>p[sec].forEach(r=>{
  r.id=r.id||(p.key+"|"+sec+"|"+(r.sub?(r.kind==="feature"?"feature:":r.kind==="tab"?"tab:":r.kind==="notif"?"notif:":r.kind==="part"?"part:":"master:"):"")+r.m);r.person=p.key;r.sec=sec;
- r.a0=r.a||"";r.w0=r.w||"";r.t0=r.t||"";ALLROWS.push(r);})));
+ r.a0=r.a||"";r.w0=r.w||"";r.t0=r.t||"";r.m0=r.m;ALLROWS.push(r);})));
 {const SH=["Sowmya","Srushti"];const paths=k=>{const p=DATA.find(x=>x.key===k);const m=new Map();let par="";p.main.forEach(r=>{if(!r.sub)par=norm(r.m);const pth=r.sub?par+"|"+(r.kind||"master")+":"+norm(r.m):par;if(!m.has(pth))m.set(pth,r);});return m;};
  const A=paths(SH[0]),B=paths(SH[1]);
  A.forEach((ra,pth)=>{const rb=B.get(pth);if(!rb)return;const sk="ss:"+pth;
   const st=saved.status[sk]||saved.status[ra.id]||saved.status[rb.id];
   [ra,rb].forEach(r=>{r.skey=sk;});
   if(!saved.status[sk]&&st)saved.status[sk]=st;});}
+// Renamed rows keep their original id (statuses, notes and layout stay attached); only the shown name changes.
+ALLROWS.forEach(r=>{const n=(saved.names||{})[r.id];if(n)r.m=n;});
 if(saved.layout){const byId=new Map(ALLROWS.map(r=>[r.id,r]));const used=new Set();
  DATA.forEach(p=>{const L=saved.layout[p.key];if(!L)return;["main","mon"].forEach(sec=>{const keep=(L[sec]||[]).map(id=>byId.get(id)).filter(Boolean);keep.forEach(r=>used.add(r.id));p[sec]=keep;});});
  ALLROWS.forEach(r=>{if(!used.has(r.id)){const p=DATA.find(x=>x.key===r.person);if(!p[r.sec].includes(r))p[r.sec].push(r);}});
@@ -410,7 +434,16 @@ const nkey=r=>r.id;const noteOf=r=>saved.notes[nkey(r)]||"";
 const hay=r=>[r.m,r.t,r.a,r.w,noteOf(r)].join(" ").toLowerCase();
 function statusFor(r,B){const st=((B===SEED?saved.status:saved.bstatus[B])||{})[r.skey||r.id]||{};const a0=B===SEED?r.a0:resetV(r.a0),w0=B===SEED?r.w0:resetV(r.w0);return {a:st.a!==undefined?st.a:(a0||""),w:st.w!==undefined?st.w:(w0||""),t:st.t!==undefined?st.t:(B===SEED?(r.t0||""):"")};}
 function applyBuild(){const B=curBuild();ALLROWS.forEach(r=>{if(r.editing)return;const s=B?statusFor(r,B):{a:"",w:"",t:""};r.a=s.a;r.w=s.w;r.t=s.t;});}
-const featKey=r=>r.uf?r.skey:"sf:"+norm(r.m);
+const featKey=r=>r.uf?r.skey:"sf:"+norm(r.m0||r.m);
+function parentName(r){if(!r.sub)return "";const arr=DATA.find(p=>p.key===r.person)[r.sec];for(let i=arr.indexOf(r)-1;i>=0;i--)if(!arr[i].sub)return arr[i].m;return "";}
+// Rename a row everywhere the same item appears (the same module can be listed under several people).
+function renameRow(r,v){const old=r.m;if(!v||v===old)return;const par=norm(parentName(r));
+ const same=ALLROWS.filter(x=>!x.editing&&norm(x.m)===norm(old)&&!!x.sub===!!r.sub&&(!r.sub||((x.kind||"")===(r.kind||"")&&norm(parentName(x))===par)));
+ saved.names=saved.names||{};
+ same.forEach(x=>{if(x.uf){const f=saved.features.find(f=>"uf:"+f.id===x.skey);if(f)f.m=v;}
+  else if(v===x.m0)delete saved.names[x.id];else saved.names[x.id]=v;x.m=v;});
+ if(!r.sub)saved.features.forEach(f=>{if(norm(f.module)===norm(old))f.module=v;});
+ persist();render();}
 function featVisible(r,B){if(!B)return true;const L=(saved.fvis||{})[B];if(L)return L.includes(featKey(r));if(r.uf){const f=saved.features.find(x=>"uf:"+x.id===r.skey);return !f||!f.build||f.build===B;}return true;}
 function markOff(track,B){const off={};DATA.forEach(p=>["main","mon"].forEach(sec=>{let par=null;p[sec].forEach(r=>{if(!r.sub)par=norm(r.m);r.off=!!off[par]||(r.kind==="feature"&&!!B&&!featVisible(r,B));});}));}
 function calcFor(B,pl,track){markOff(track,B);const g=new Map(),out=new Set();
@@ -426,10 +459,35 @@ function match(r){
  return true;}
 function moduleNames(){const s=new Map();DATA.forEach(p=>["main","mon"].forEach(sec=>p[sec].forEach(r=>{if(!r.sub&&!r.editing&&r.m){const k=norm(r.m);if(!s.has(k))s.set(k,{name:r.m,people:new Set()});s.get(k).people.add(p.key==="All"?"All":p.key);}})));
  return [...s.values()].sort((a,b)=>a.name.localeCompare(b.name));}
-function selectHTML(r,f){const v=r[f];const opts=statuses();
- return `<select class="s${v?" has":""}" data-id="${esc(r.id)}" data-f="${f}" aria-label="${f==="a"?"App":"Web"} status for ${esc(r.m)}" style="${v?cssVars(v):""}">
- <option value=""${v?"":" selected"}>Select</option>${opts.map(o=>`<option${o===v?" selected":""}>${esc(o)}</option>`).join("")}
- ${v&&!opts.includes(v)?`<option selected>${esc(v)}</option>`:""}<option value="__new">+ Add new status</option></select>`;}
+function selectHTML(r,f){const v=r[f];
+ return `<button type="button" class="stbtn${v?" has":""}" data-id="${esc(r.id)}" data-f="${f}" aria-haspopup="listbox" aria-expanded="false" aria-label="${f==="a"?"App":"Web"} status for ${esc(r.m)}: ${esc(v||"not set")}" style="${v?cssVars(v):""}">${v?`<i></i>${esc(v)}`:"Select"}<svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>`;}
+/* ---------- Status dropdown ---------- */
+let stMenu=null;
+function openStMenu(btn){closeStMenu();const r=ALLROWS.find(x=>x.id===btn.dataset.id);if(!r)return;const f=btn.dataset.f;const cur=r[f]||"";
+ const opts=statuses();const list=cur&&!opts.includes(cur)?[...opts,cur]:opts;
+ const m=document.createElement("div");m.className="stmenu";m.setAttribute("role","listbox");m.setAttribute("aria-label",`${f==="a"?"App":"Web"} status for ${r.m}`);
+ m.innerHTML=list.map(s=>`<button type="button" class="stopt" role="option" aria-selected="${s===cur}" data-v="${esc(s)}"><i style="background:var(--c-${COL[s]||"x"})"></i><span>${esc(s)}</span>${s===cur?`<b aria-hidden="true">✓</b>`:""}</button>`).join("")+
+  `<div class="stsep" role="separator"></div>`+(cur?`<button type="button" class="stopt muted" role="option" aria-selected="false" data-v="">Clear status</button>`:"")+`<button type="button" class="stopt add" role="option" aria-selected="false" data-v="__new">+ Add new status</button>`;
+ document.body.appendChild(m);
+ const b=btn.getBoundingClientRect(),h=m.offsetHeight,w=m.offsetWidth;let top=b.bottom+6;if(top+h>innerHeight-8&&b.top-h-6>8)top=b.top-h-6;
+ m.style.top=Math.max(8,top)+"px";m.style.left=Math.max(8,Math.min(b.left,innerWidth-w-8))+"px";
+ btn.setAttribute("aria-expanded","true");stMenu={m,btn,r,f};
+ (m.querySelector('[aria-selected="true"]')||m.querySelector(".stopt")).focus();}
+function closeStMenu(refocus){if(!stMenu)return;const {m,btn}=stMenu;m.remove();btn.setAttribute("aria-expanded","false");stMenu=null;if(refocus&&document.body.contains(btn))btn.focus();}
+function focusStBtn(r,f){const b=document.querySelector(`.stbtn[data-id="${CSS.escape(r.id)}"][data-f="${f}"]`);if(b)b.focus();}
+function pickStatus(v){const {r,f}=stMenu;closeStMenu();
+ const save=val=>{const B=curBuild();if(!B)return;const k=r.skey||r.id;const store=bstore(B);store[k]=Object.assign(store[k]||{},{[f]:val});persist();render();focusStBtn(r,f);};
+ if(v==="__new"){askText({title:"Add new status",label:"Status name",ok:"Add status"}).then(n=>{if(!n){focusStBtn(r,f);return;}if(!statuses().includes(n))saved.custom.push(n);save(n);});return;}
+ save(v);}
+document.addEventListener("keydown",e=>{if(!stMenu)return;const items=[...stMenu.m.querySelectorAll(".stopt")];const i=items.indexOf(document.activeElement);
+ if(e.key==="Escape"){e.preventDefault();closeStMenu(true);}
+ else if(e.key==="Tab"){closeStMenu();}
+ else if(e.key==="ArrowDown"){e.preventDefault();items[(i+1)%items.length].focus();}
+ else if(e.key==="ArrowUp"){e.preventDefault();items[(i-1+items.length)%items.length].focus();}
+ else if(e.key==="Home"){e.preventDefault();items[0].focus();}
+ else if(e.key==="End"){e.preventDefault();items[items.length-1].focus();}});
+window.addEventListener("scroll",e=>{if(stMenu&&e.target!==stMenu.m)closeStMenu();},true);
+window.addEventListener("resize",()=>closeStMenu());
 const TAG={part:"",notif:`<span class="mtag ntag">Notification</span>`,tab:`<span class="mtag ttag">Tab</span>`,report:`<span class="mtag rtag">Report</span>`,feature:`<span class="mtag ftag">New feature</span>`};
 function tableHTML(rows,pk){let par=null;const out=[];const showA=P()!=="web",showW=P()!=="app";const ed=noteEdit.has(pk);const showN=ed||rows.some(r=>noteOf(r));
  rows.forEach((r,i)=>{if(!r.sub)par=r;const nx=rows[i+1];const has=!r.sub&&nx&&nx.sub;
@@ -437,7 +495,7 @@ function tableHTML(rows,pk){let par=null;const out=[];const showA=P()!=="web",sh
   const shut=has&&saved.collapsed[r.id];
   const cls=r.sub?("subrow"+(nx&&nx.sub?"":" last")):(has&&!shut?"hassub":"");
   const tog=has?`<button class="tog" data-tog="${esc(r.id)}" aria-expanded="${!shut}" aria-label="${shut?"Show":"Hide"} items under ${esc(r.m)}" title="${shut?"Show":"Hide"}">${shut?"▸":"▾"}</button>`:"";
-  out.push(`<tr class="${cls}" data-id="${esc(r.id)}" data-person="${esc(r.person)}" data-sec="${r.sec}"><td class="mod">${r.editing?`<input class="newmod" data-id="${esc(r.id)}" placeholder="Module name" aria-label="Module name">`:`<span class="grip" draggable="true" data-drag="${esc(r.id)}" title="Drag to another person" aria-hidden="true">⠿</span>`+(r.sub?((r.kind in TAG)?TAG[r.kind]:`<span class="mtag">Master</span>`):"")+esc(r.m)+tog}</td>${showA?`<td class="st">${selectHTML(r,"a")}</td>`:""}${showW?`<td class="st">${selectHTML(r,"w")}</td>`:""}<td class="tb">${r.editing?"":`<button type="button" class="tbedit" data-tb="${esc(r.id)}" aria-label="Edit tested by for ${esc(r.m)}" title="Edit tested by">${r.t&&r.t!=="—"?esc(r.t):`<span class="tbadd">Add name</span>`}</button>`}</td>${showN?`<td class="nt">${ed&&!r.editing?`<div class="nwrap"><input class="noteinp" data-nid="${esc(nkey(r))}" value="${esc(noteOf(r))}" placeholder="Add a note" aria-label="Note for ${esc(r.m)}"><button class="nsend" aria-label="Save note for ${esc(r.m)}" title="Save note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:esc(noteOf(r))}</td>`:""}</tr>`);});
+  out.push(`<tr class="${cls}" data-id="${esc(r.id)}" data-person="${esc(r.person)}" data-sec="${r.sec}"><td class="mod">${r.editing?`<input class="newmod" data-id="${esc(r.id)}" placeholder="Module name" aria-label="Module name">`:`<span class="grip" draggable="true" data-drag="${esc(r.id)}" title="Drag to another person" aria-hidden="true">⠿</span>`+(r.sub?((r.kind in TAG)?TAG[r.kind]:`<span class="mtag">Master</span>`):"")+esc(r.m)+`<button type="button" class="mren" data-ren="${esc(r.id)}" aria-label="Rename ${esc(r.m)}" title="Rename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>`+tog}</td>${showA?`<td class="st">${selectHTML(r,"a")}</td>`:""}${showW?`<td class="st">${selectHTML(r,"w")}</td>`:""}<td class="tb">${r.editing?"":`<button type="button" class="tbedit" data-tb="${esc(r.id)}" aria-label="Edit tested by for ${esc(r.m)}" title="Edit tested by">${r.t&&r.t!=="—"?esc(r.t):`<span class="tbadd">Add name</span>`}</button>`}</td>${showN?`<td class="nt">${ed&&!r.editing?`<div class="nwrap"><input class="noteinp" data-nid="${esc(nkey(r))}" value="${esc(noteOf(r))}" placeholder="Add a note" aria-label="Note for ${esc(r.m)}"><button class="nsend" aria-label="Save note for ${esc(r.m)}" title="Save note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:esc(noteOf(r))}</td>`:""}</tr>`);});
  return `<div class="tbl"><table><thead><tr><th>Module</th>${showA?"<th>App status</th>":""}${showW?"<th>Web status</th>":""}<th>Tested by</th>${showN?"<th>Notes</th>":""}</tr></thead><tbody>${out.join("")}</tbody></table></div>`;}
 function cnt(m,mo){const a=[...m,...mo].filter(onPlat);const c=k=>a.filter(r=>r.sub&&(k==="master"?!r.kind:r.kind===k)).length;const w=(n,one,many)=>n?`, ${n} ${n===1?one:many}`:"";const mods=a.filter(r=>!r.sub).length;
  return `${mods} ${mods===1?"module":"modules"}`+w(c("master"),"master","masters")+w(c("report"),"report","reports")+w(c("feature"),"new feature","new features")+w(c("tab"),"tab","tabs")+w(c("part"),"sub-module","sub-modules")+w(c("notif"),"notification","notifications");}
@@ -475,8 +533,15 @@ function render(){
  document.getElementById("main").innerHTML=html||`<div class="card empty">No modules match. Clear the search or pick another status.</div>`;
 }
 document.addEventListener("click",e=>{
+ const so=e.target.closest(".stopt");if(so&&stMenu){pickStatus(so.dataset.v);return;}
+ const stb=e.target.closest(".stbtn");if(stb){if(stMenu&&stMenu.btn===stb)closeStMenu(true);else openStMenu(stb);return;}
+ if(stMenu&&!e.target.closest(".stmenu"))closeStMenu();
  const tbb=e.target.closest(".tbedit");if(tbb){const r=ALLROWS.find(x=>x.id===tbb.dataset.tb);const B=curBuild();if(!r||!B)return;
   askText({title:"Tested by",label:`Who tested ${r.m}?`,value:r.t==="—"?"":(r.t||""),ok:"Save",allowEmpty:true}).then(v=>{if(v===null)return;const k=r.skey||r.id;const store=bstore(B);store[k]=Object.assign(store[k]||{},{t:v});persist();render();});return;}
+ const rn=e.target.closest(".mren");if(rn){const r=ALLROWS.find(x=>x.id===rn.dataset.ren);if(!r)return;
+  askText({title:r.sub?"Rename item":"Rename module",label:r.sub?"Name":"Module name",value:r.m,ok:"Save",
+   check:v=>!r.sub&&norm(v)!==norm(r.m)&&ALLROWS.some(x=>!x.sub&&!x.editing&&norm(x.m)===norm(v))?"A module with that name already exists.":null})
+  .then(v=>{if(v!==null)renameRow(r,v);});return;}
  const ns=e.target.closest(".nsend");if(ns){submitNote(ns.parentElement.querySelector("input.noteinp"));return;}
  const nb=e.target.closest(".notebtn");if(nb){const k=nb.dataset.note;if(noteEdit.has(k))noteEdit.delete(k);else noteEdit.add(k);render();if(noteEdit.has(k)){const f=document.querySelector(`.card[data-person="${CSS.escape(k)}"] .noteinp`);if(f)f.focus();}return;}
  const sg=e.target.closest(".segb");if(sg){saved.plat=sg.dataset.plat;persist();render();return;}
@@ -491,11 +556,6 @@ document.addEventListener("click",e=>{
 document.getElementById("main").addEventListener("change",e=>{
  const as=e.target.closest("select.assign");if(as){if(!as.value)return;const i=saved.unmatched.findIndex(u=>u.id===as.dataset.u);if(i<0)return;
   const u=saved.unmatched.splice(i,1)[0];{const B=curBuild();saved.features.push({id:u.id,m:u.m,module:as.value,a:u.a||"",t:u.t||"",build:B});if(B&&saved.fvis&&saved.fvis[B])saved.fvis[B].push("uf:"+u.id);}persist();removeFeatures();insertFeatures();reorderByLayout();render();return;}
- const sel=e.target.closest("select.s");if(!sel)return;
- const r=ALLROWS.find(x=>x.id===sel.dataset.id);const f=sel.dataset.f;let v=sel.value;
- const save=val=>{const B=curBuild();if(!B)return;const k=r.skey||r.id;const store=bstore(B);store[k]=Object.assign(store[k]||{},{[f]:val});persist();render();};
- if(v==="__new"){sel.value=r[f]||"";askText({title:"Add new status",label:"Status name",ok:"Add status",check:n=>null}).then(n=>{if(!n)return;if(!statuses().includes(n))saved.custom.push(n);save(n);});return;}
- save(v);
 });
 let dragId=null;
 function clearOver(){document.querySelectorAll(".over,.nest,.afterln").forEach(x=>x.classList.remove("over","nest","afterln"));}
@@ -649,7 +709,7 @@ document.addEventListener("change",e=>{
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(relOpen||bldOpen)){const id=relOpen?"relbtn":"bldbtn";relOpen=false;bldOpen=false;renderBuildbar();const b=document.getElementById(id);if(b)b.focus();}});
 if(ONLINE){
  persist();
- setInterval(()=>{const ae=document.activeElement;if(document.querySelector("dialog[open]")||(ae&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName))||relOpen||bldOpen||dragId)return;
+ setInterval(()=>{const ae=document.activeElement;if(document.querySelector("dialog[open]")||(ae&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName))||relOpen||bldOpen||dragId||stMenu)return;
   fetch("/api/state",{credentials:"same-origin"}).then(r=>r.ok?r.json():null).then(s=>{if(!s)return;
    const docNow=stable(docOf(saved)),docSrv=stable(docOf(s.doc||{}));
    if(docNow!==docSrv){location.reload();return;}
