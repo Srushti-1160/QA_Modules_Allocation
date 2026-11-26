@@ -415,9 +415,9 @@ const allBuilds=()=>Object.entries(saved.builds||{}).flatMap(([sk,L])=>(L||[]).m
 function applyRemoved(){const keep=new Map();(saved.removed||[]).forEach(x=>{if(typeof x==="string")keep.set(x,[]);else if(x&&x.id)keep.set(x.id,x.keep||[]);});
  ALLROWS.forEach(r=>{if(keep.has(r.id))r.onlyIn=keep.get(r.id);else delete r.onlyIn;});}
 const hiddenIn=(r,B)=>!!B&&((!!r.onlyIn&&!r.onlyIn.includes(B))||(!!r.notIn&&r.notIn.includes(B)));
-// Notes used to be shared by all builds: give every existing build its own copy once.
-{const legacy=Object.keys(saved.notes||{}).filter(k=>!k.includes("#"));if(legacy.length){const bs=allBuilds();
- legacy.forEach(k=>{bs.forEach(b=>{const nk=b+"#"+k;if(saved.notes[nk]===undefined)saved.notes[nk]=saved.notes[k];});delete saved.notes[k];});persist();}}
+// Notes are per build ("build#row"). Notes saved before that had no build: they go to v6.4.1(10) only, never to other builds.
+{const legacy=Object.keys(saved.notes||{}).filter(k=>!k.includes("#"));if(legacy.length){const bs=allBuilds();const home=bs.includes(SEED)?SEED:bs[0];
+ legacy.forEach(k=>{if(home){const nk=home+"#"+k;if(saved.notes[nk]===undefined)saved.notes[nk]=saved.notes[k];}delete saved.notes[k];});persist();}}
 {const SH=["Sowmya","Srushti"];const paths=k=>{const p=DATA.find(x=>x.key===k);const m=new Map();let par="";p.main.forEach(r=>{if(!r.sub)par=norm(r.m);const pth=r.sub?par+"|"+(r.kind||"master")+":"+norm(r.m):par;if(!m.has(pth))m.set(pth,r);});return m;};
  const A=paths(SH[0]),B=paths(SH[1]);
  A.forEach((ra,pth)=>{const rb=B.get(pth);if(!rb)return;const sk="ss:"+pth;
