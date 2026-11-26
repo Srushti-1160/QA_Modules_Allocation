@@ -246,6 +246,14 @@ dialog#modDlg>div{padding:0 26px}
 .relopt:hover,.relopt[aria-selected="true"]{background:#f1eee6}
 .relopt .reltx small{font-weight:500;font-size:12px;margin-top:2px}
 .bldmenu{max-height:320px;overflow:auto}
+.bldnote{margin:6px 10px 4px;font-size:12px;color:var(--muted);max-width:220px}
+.bldmenu{min-width:260px}
+.bldrow{display:flex;align-items:center;gap:2px}
+.bldrow .relopt{flex:1;min-width:0}
+.bldact{flex:none;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center;padding:0}
+.bldact:hover{background:#f1eee6;color:var(--ink)}
+.bldact.del:hover{background:var(--c-nd-bg);color:var(--c-nd)}
+.bldact:focus-visible{outline:2px solid var(--c-prog);outline-offset:1px}
 .latest{margin-left:auto;font-size:11px;font-weight:700;color:#3f9a52;background:#e3f2e4;border-radius:999px;padding:2px 8px}
 .latest+.relchk{margin-left:10px}
 .relchk{min-width:12px;text-align:right;margin-left:auto;color:#3f9a52;font-weight:800}
@@ -353,7 +361,7 @@ const KEY="uat-6410-alloc-v1";
 const SERVER=/*__STATE__*/null;
 const ONLINE=!!SERVER;
 const UI_KEYS=["collapsed","view","plat","sideClosed","off"];
-const SHARED_DOC=["builds","custom","added","layout","nest","features","unmatched","seeded","fvis","names","removed","synced"];
+const SHARED_DOC=["builds","custom","added","layout","nest","features","unmatched","seeded","fvis","names","removed","synced","wbuilds","bnames"];
 let saved={status:{},custom:[],added:{},collapsed:{},features:[],unmatched:[],seeded:false};
 try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(ONLINE){UI_KEYS.forEach(k=>{if(o[k]!==undefined)saved[k]=o[k];});}else saved=Object.assign(saved,o);}}catch(e){}
 if(ONLINE){Object.assign(saved,SERVER.doc||{});saved.status=SERVER.status||{};saved.bstatus=SERVER.bstatus||{};saved.notes=SERVER.notes||{};}
@@ -374,6 +382,18 @@ delete saved.builds["saas|prod"];["saas|prod:tf","saas|prod:as"].forEach(k=>save
 const stageKey=()=>{const t=saved.view.track,s=saved.view.stage[t];return t+"|"+s+(t==="saas"&&s==="prod"?":"+saved.view.sub:"");};
 const stageLabel=()=>{const t=saved.view.track,s=saved.view.stage[t];return stageName(t,s)+(t==="saas"&&s==="prod"?" › "+SUBS[saved.view.sub]:"");};
 const curBuild=()=>{const sk=stageKey();const L=saved.builds[sk]||[];let b=saved.view.build[sk];if(!L.includes(b))b=L[L.length-1];return b?sk+"|"+b:null;};
+/* ---------- Separate Web build numbers ----------
+   saved.wbuilds[stage] = [{n: name, k: status key}]. Until a stage has its own web build, Web uses the App builds
+   (same key, so web statuses saved so far stay where they are). Adding the first web build splits the stage. */
+const webSeparate=(sk=stageKey())=>!!(saved.wbuilds&&saved.wbuilds[sk]);
+const webList=(sk=stageKey())=>webSeparate(sk)?saved.wbuilds[sk]:(saved.builds[sk]||[]).map(n=>({n,k:sk+"|"+n}));
+const webBuild=()=>{const sk=stageKey();if(!webSeparate(sk))return curBuild();const L=webList(sk);const n=(saved.view.wbuild||{})[sk];const e=L.find(x=>x.n===n)||L[L.length-1];return e?e.k:null;};
+// The build whose rows/notes the current view shows: the web build in the Web view, otherwise the app build.
+const viewBuild=()=>P()==="web"?webBuild():curBuild();
+// Build names shown on screen. App builds can be renamed (saved.bnames[key]); the key stays, so statuses and notes stay attached.
+const appName=k=>k?((saved.bnames||{})[k]||k.split("|")[2]):"";
+const webName=k=>{if(!k)return "";for(const L of Object.values(saved.wbuilds||{})){const e=(L||[]).find(x=>x.k===k);if(e)return e.n;}return appName(k);};
+const buildName=(k,web)=>web?webName(k):appName(k);
 const bstore=B=>B===SEED?saved.status:(saved.bstatus[B]=saved.bstatus[B]||{});
 const resetV=v=>EXC.includes(v)?v:(v?"Not started":"");["custom","features","unmatched"].forEach(k=>saved[k]=saved[k]||[]);
 let ME="";try{ME=localStorage.getItem("uat-user")||"";}catch(e){}
@@ -410,7 +430,7 @@ DATA.forEach(p=>["main","mon"].forEach(sec=>p[sec].forEach(r=>{
 // Rows the team removed stay removed.
 /* ---------- Build history: each build keeps its own rows and notes ---------- */
 // Every build that exists, as "track|stage|build".
-const allBuilds=()=>Object.entries(saved.builds||{}).flatMap(([sk,L])=>(L||[]).map(n=>sk+"|"+n));
+const allBuilds=()=>[...new Set([...Object.entries(saved.builds||{}).flatMap(([sk,L])=>(L||[]).map(n=>sk+"|"+n)),...Object.values(saved.wbuilds||{}).flatMap(L=>(L||[]).map(x=>x.k))])];
 // Removed rows stay in the builds that existed when they were removed (saved.removed: {id, keep:[builds]}; a plain id = removed from every build).
 function applyRemoved(){const keep=new Map();(saved.removed||[]).forEach(x=>{if(typeof x==="string")keep.set(x,[]);else if(x&&x.id)keep.set(x.id,x.keep||[]);});
  ALLROWS.forEach(r=>{if(keep.has(r.id))r.onlyIn=keep.get(r.id);else delete r.onlyIn;});}
@@ -533,13 +553,14 @@ const onPlat=r=>P()==="both"||!!vals(r,P())[0];
 const statuses=()=>[...BASE,...saved.custom];
 const cssVars=s=>{const k=COL[s]||"x";return `color:var(--c-${k});background-color:var(--c-${k}-bg)`;};
 saved.notes=saved.notes||{};const noteEdit=new Set();
-const nkey=r=>(curBuild()||"")+"#"+r.id;const noteOf=r=>saved.notes[nkey(r)]||"";
+const nkey=r=>(viewBuild()||"")+"#"+r.id;const noteOf=r=>saved.notes[nkey(r)]||"";
 // The Web view has no "Tested by" column, so tester names are not searched there.
 const hay=r=>(P()==="web"?[r.m,r.w,noteOf(r)]:[r.m,r.t,r.a,r.w,noteOf(r)]).join(" ").toLowerCase();
 // A module (not its sub-items) with no App status counts as "Not started". Web-only modules have no App status.
 const defA=(r,a)=>a||(r.sub||r.only==="web"?"":"Not started");
 function statusFor(r,B){const st=((B===SEED?saved.status:saved.bstatus[B])||{})[r.skey||r.id]||{};const a0=B===SEED?r.a0:resetV(r.a0),w0=B===SEED?r.w0:resetV(r.w0);return {a:defA(r,st.a!==undefined?st.a:(a0||"")),w:st.w!==undefined?st.w:(w0||""),t:st.t!==undefined?st.t:(B===SEED?(r.t0||""):"")};}
-function applyBuild(){const B=curBuild();ALLROWS.forEach(r=>{if(r.editing)return;const s=B?statusFor(r,B):{a:"",w:"",t:""};r.a=s.a;r.w=s.w;r.t=s.t;});}
+// App status and Tested by come from the app build, Web status from the web build.
+function applyBuild(){const B=curBuild(),W=webBuild();ALLROWS.forEach(r=>{if(r.editing)return;const s=B?statusFor(r,B):{a:"",w:"",t:""};const ws=!W?{w:""}:W===B?s:statusFor(r,W);r.a=s.a;r.w=ws.w;r.t=s.t;});}
 const isFeat=r=>r.kind==="feature"||r.kind==="bug";
 const featKey=r=>r.uf?r.skey:"sf:"+norm(r.m0||r.m);
 function parentName(r){if(!r.sub)return "";const arr=DATA.find(p=>p.key===r.person)[r.sec];for(let i=arr.indexOf(r)-1;i>=0;i--)if(!arr[i].sub)return arr[i].m;return "";}
@@ -551,7 +572,7 @@ function sameRows(r){if(isAdded(r))return [r];const par=norm(parentName(r));retu
 // Remove rows for good: a module takes its items with it.
 // dropFeatures: also delete new-feature / bug-fix records (only when no copy of their module is left).
 // Remove rows from the current build (and builds added later). Builds that already exist keep them, with their statuses and notes.
-function removeRows(rows){const B=curBuild();if(!B)return;const drop=new Set();
+function removeRows(rows){const B=viewBuild();if(!B)return;const drop=new Set();
  rows.forEach(r=>{drop.add(r);if(!r.sub){const arr=DATA.find(p=>p.key===r.person)[r.sec];for(let j=arr.indexOf(r)+1;arr[j]&&arr[j].sub;j++)drop.add(arr[j]);}});
  saved.removed=saved.removed||[];const others=allBuilds().filter(b=>b!==B);
  drop.forEach(x=>{if(hiddenIn(x,B))return;const i=saved.removed.findIndex(e=>e===x.id||(e&&e.id===x.id));
@@ -563,7 +584,7 @@ function askRemove(r){const all=sameRows(r);const others=[...new Set(all.filter(
  const me=DATA.find(p=>p.key===r.person).name;
  const what=`“${r.m}”`+(kids?` and the ${kids} ${kids===1?"item":"items"} under it`:"");
  const shared=r.uf;// a new feature / bug fix is one record shown under every copy of its module
- const bname=(curBuild()||"").split("|")[2]||"this build";const olds=allBuilds().filter(b=>b!==curBuild()).length;
+ const bname=buildName(viewBuild(),P()==="web")||"this build";const olds=allBuilds().filter(b=>b!==viewBuild()).length;
  const note=` It is removed from ${bname} and from builds you add later.${olds?" Builds that already exist keep it, with their statuses and notes.":""}`;
  if(!others.length||shared){askChoice({title:r.sub?"Remove item":"Remove module",text:`Remove ${what}${others.length?` (also listed under ${others.join(", ")})`:""}?${note}`,yes:"Remove",no:null}).then(v=>{if(v)removeRows(shared?all:[r]);});return;}
  askChoice({title:r.sub?"Remove item":"Remove module",text:`Remove ${what}? It is also listed under ${others.join(", ")}.${note}`,yes:"Remove everywhere",no:`Only from ${me}`}).then(v=>{if(v===null)return;removeRows(v?all:[r]);});}
@@ -584,7 +605,7 @@ function calcFor(B,pl,track){markOff(track,B);const g=new Map(),out=new Map();
 DATA.filter(p=>!p.group).forEach(p=>["main"].forEach(sec=>{let cur=null;p[sec].forEach(r=>{if(r.editing||r.off)return;const s=statusFor(r,B);const f=(pl==="app"?[s.a]:pl==="web"?[s.w]:[s.a,s.w]).filter(Boolean);
   if(!r.sub){cur=null;if(!f.length)return;const k=norm(r.m);if(f.some(x=>EXC.includes(x))){if(!out.has(k))out.set(k,{m:r.m,s:f.find(x=>EXC.includes(x))});return;}cur=k;if(!g.has(k))g.set(k,true);if(!f.every(x=>x==="Completed"))g.set(k,false);}
   else if(cur&&f.length&&!f.some(x=>EXC.includes(x))&&!f.every(x=>x==="Completed"))g.set(cur,false);});}));
- out.forEach((v,k)=>g.delete(k));let c=0;g.forEach(x=>{if(x)c++;});markOff(saved.view.track,curBuild());return {total:g.size,done:c,pend:g.size-c,out:[...out.values()]};}
+ out.forEach((v,k)=>g.delete(k));let c=0;g.forEach(x=>{if(x)c++;});markOff(saved.view.track,viewBuild());return {total:g.size,done:c,pend:g.size-c,out:[...out.values()]};}
 // On web = has a Web status, or (for a module) one of its sub-items does.
 function onWeb(r){if(r.w)return true;if(r.sub)return false;const arr=DATA.find(p=>p.key===r.person)[r.sec];
  for(let j=arr.indexOf(r)+1;arr[j]&&arr[j].sub;j++)if(arr[j].w&&!arr[j].off)return true;return false;}
@@ -615,7 +636,7 @@ function openStMenu(btn){closeStMenu();const r=ALLROWS.find(x=>x.id===btn.datase
 function closeStMenu(refocus){if(!stMenu)return;const {m,btn}=stMenu;m.remove();btn.setAttribute("aria-expanded","false");stMenu=null;if(refocus&&document.body.contains(btn))btn.focus();}
 function focusStBtn(r,f){const b=document.querySelector(`.stbtn[data-id="${CSS.escape(r.id)}"][data-f="${f}"]`);if(b)b.focus();}
 function pickStatus(v){const {r,f}=stMenu;closeStMenu();
- const save=val=>{const B=curBuild();if(!B)return;const k=r.skey||r.id;const store=bstore(B);store[k]=Object.assign(store[k]||{},{[f]:val});persist();render();focusStBtn(r,f);};
+ const save=val=>{const B=f==="w"?webBuild():curBuild();if(!B)return;const k=r.skey||r.id;const store=bstore(B);store[k]=Object.assign(store[k]||{},{[f]:val});persist();render();focusStBtn(r,f);};
  if(v==="__new"){askText({title:"Add new status",label:"Status name",ok:"Add status"}).then(n=>{if(!n){focusStBtn(r,f);return;}if(!statuses().includes(n))saved.custom.push(n);save(n);});return;}
  save(v);}
 document.addEventListener("keydown",e=>{if(!stMenu)return;const items=[...stMenu.m.querySelectorAll(".stopt")];const i=items.indexOf(document.activeElement);
@@ -647,13 +668,14 @@ function unmatchedHTML(){if(!saved.unmatched.length||state.person!=="__all"||P()
  <p class="none">Pick a module and the item moves under it.</p><div class="tbl"><table><thead><tr><th>Item</th><th>App status</th>${P()==="web"?"":"<th>Tested by</th>"}<th>Move to module</th></tr></thead><tbody>${
  saved.unmatched.map(u=>`<tr><td class="mod">${u.type==="bug"?TAG.bug:TAG.feature}${esc(u.m)}</td><td class="st">${u.a?`<span class="chip" style="${cssVars(u.a)}">${esc(u.a)}</span>`:""}</td>${P()==="web"?"":`<td class="tb">${esc(u.t)}</td>`}<td><select class="assign" data-u="${esc(u.id)}" aria-label="Module for ${esc(u.m)}"><option value="">Choose module</option>${mods.map(x=>`<option value="${esc(x.name)}">${esc(x.name)} (${esc([...x.people].join(", "))})</option>`).join("")}</select></td></tr>`).join("")}</tbody></table></div></section>`;}
 function render(){
- applyBuild();markOff(saved.view.track,curBuild());
+ applyBuild();markOff(saved.view.track,viewBuild());
  const vis=ALLROWS.filter(r=>match(r)&&onPlat(r));
  const B=curBuild(),TK=saved.view.track;
  document.getElementById("q").placeholder=P()==="web"?"Search module…":"Search module or tester…";
- document.getElementById("crumb").textContent=`${TRACKS[TK].label} › ${stageLabel()}`+(B?` › ${B.split("|")[2]}`:"");
+ {const W=webBuild();const sep=webSeparate();const bn=P()==="web"?webName(W):P()==="both"&&sep?`App ${appName(B)||"—"} · Web ${webName(W)||"—"}`:appName(B);
+  document.getElementById("crumb").textContent=`${TRACKS[TK].label} › ${stageLabel()}`+(bn?` › ${bn}`:"");}
  {const pls=P()==="both"?["app","web"]:[P()];
-  document.getElementById("stats").innerHTML=!B?`<div class="sc nob">No build in this stage yet. Use “+ New build” to add one.</div>`:pls.map(pl=>{const s=calcFor(B,pl,TK);const pc=s.total?Math.round(s.done/s.total*100):0;
+  document.getElementById("stats").innerHTML=!viewBuild()?`<div class="sc nob">No build in this stage yet. Use “+ New build” to add one.</div>`:pls.map(pl=>{const Bp=pl==="web"?webBuild():B;if(!Bp)return `<div class="srow"><div class="sc nob">No ${pl==="web"?"web":"app"} build in this stage yet.</div></div>`;const s=calcFor(Bp,pl,TK);const pc=s.total?Math.round(s.done/s.total*100):0;
    const ic=pl==="app"?`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>`:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`;
    const left=s.out.length?`${s.out.length} left out: ${s.out.map(o=>`${o.m} (${o.s})`).join(", ")}`:"Each module counted once";
    return `<div class="srow"><div class="slab"><span class="plat"><i>${ic}</i>${pl==="app"?"App":"Web"}</span><span class="psum">${s.done} of ${s.total} completed</span></div><div class="scards"><div class="sc"><span class="sct"><i style="background:#e0782a"></i>Total modules</span><b>${s.total}</b><div class="bar"><span style="width:100%;background:#f0c79c"></span></div><small class="scn" title="${esc(left)}">${esc(left)}</small></div><div class="sc"><span class="sct"><i style="background:#3f9a52"></i>Completed <em class="pc">${pc}%</em></span><b>${s.done}</b><div class="bar"><span style="width:${pc}%;background:#5fae6e"></span></div></div><div class="sc"><span class="sct"><i style="background:#a51d4a"></i>Pending</span><b>${s.pend}</b><div class="bar"><span style="width:${s.total?100-pc:0}%;background:#d98aa2"></span></div></div></div></div>`;}).join("");}
@@ -670,7 +692,7 @@ function render(){
   const inGroup=g=>DATA.filter(p=>(p.group||"")===g);
   sd.innerHTML=`<div class="sidehead"><h2>${P()==="app"?"App":P()==="web"?"Web":"App/Web"}</h2><button class="sidetog" aria-label="Close people list" title="Close people list" aria-expanded="true">‹</button></div><button data-p="__all" aria-current="${state.person==="__all"}">Everyone <span>${new Set(listed.filter(r=>!isOther(r.person)).map(r=>norm(r.m))).size}</span></button>`+
   inGroup("").map(pbtn).join("")+(P()==="web"?[]:GROUPS).map(g=>{const L=inGroup(g.id);return L.length?`<h2 class="grp">${esc(g.label)}</h2>`+L.map(pbtn).join(""):"";}).join("");}
- if(!B){document.getElementById("main").innerHTML=`<div class="card empty">No build in ${esc(TRACKS[TK].label)} › ${esc(stageLabel())} yet.<br><button class="btn primary" id="newb2">+ New build</button></div>`;return;}
+ if(!viewBuild()){document.getElementById("main").innerHTML=`<div class="card empty">No build in ${esc(TRACKS[TK].label)} › ${esc(stageLabel())} yet.<br><button class="btn primary" id="newb2">+ New build</button></div>`;return;}
  const people=[...DATA.filter(p=>!p.group),...GROUPS.flatMap(g=>DATA.filter(p=>p.group===g.id))].filter(p=>state.person==="__all"||p.key===state.person);let otherHead=false,lastGroup="";
  let html="";
  people.forEach(p=>{const m=p.main.filter(match),mo=p.mon.filter(match);if(!m.length&&!mo.length&&(state.q||state.status))return;
@@ -747,7 +769,7 @@ function finish(inp,keep,blur){const r=ALLROWS.find(x=>x.id===inp.dataset.id);if
   const msg=`“${dup.m}” is already ${r.sub?`under ${parentName(r)}`:`in ${who}’s ${list?list+" ":""}list`}${hidden?" (hidden by the current filter or search).":"."}`;
   if(!blur){showSync(msg,true);inp.setAttribute("aria-invalid","true");inp.title=msg;inp.focus();inp.select();return;}
   keep=false;showSync(msg,true);}
- if(keep&&v){r.m=v;r.m0=v;r.a0="";r.w0=r.w||"";r.t0="";delete r.editing;if(r.sub)setNest(r,true);const rec={id:r.id,m:v};if(r.w)rec.w=r.w;if(r.only)rec.only=r.only;{const B=curBuild();const old=allBuilds().filter(b=>b!==B);if(old.length){rec.notIn=old;r.notIn=old;}}(saved.added[r.person]=saved.added[r.person]||[]).push(rec);persist();saveLayout();}
+ if(keep&&v){r.m=v;r.m0=v;r.a0="";r.w0=r.w||"";r.t0="";delete r.editing;if(r.sub)setNest(r,true);const rec={id:r.id,m:v};if(r.w)rec.w=r.w;if(r.only)rec.only=r.only;{const B=viewBuild();const old=allBuilds().filter(b=>b!==B);if(old.length){rec.notIn=old;r.notIn=old;}}(saved.added[r.person]=saved.added[r.person]||[]).push(rec);persist();saveLayout();}
  else{const L=p[r.sec];L.splice(L.indexOf(r),1);ALLROWS.splice(ALLROWS.indexOf(r),1);}
  render();}
 document.getElementById("main").addEventListener("keydown",e=>{const i=e.target.closest("input.newmod");if(!i)return;
@@ -837,7 +859,7 @@ document.getElementById("impAdd").addEventListener("click",()=>{
  preview.filter(p=>p.m.trim()).forEach(p=>{const it={id:p.id,m:p.m.trim(),a:p.a||"",t:p.t||"",type:p.type==="bug"?"bug":"feature"};
   if(p.module){const B=curBuild();saved.features.push({...it,module:p.module,build:B});if(B&&saved.fvis&&saved.fvis[B])saved.fvis[B].push("uf:"+it.id);}else saved.unmatched.push(it);});
  persist();removeFeatures();insertFeatures();reorderByLayout();render();dlg.close();});
-function guessName(){const t=saved.view.track,s=saved.view.stage[t];const L=saved.builds[stageKey()]||[];const inc=n=>{const m=/^(.*)\((\d+)\)\s*$/.exec(n);return m?`${m[1]}(${+m[2]+1})`:n+" (2)";};
+function guessName(){const t=saved.view.track,s=saved.view.stage[t];const L=(saved.builds[stageKey()]||[]).map(n=>appName(stageKey()+"|"+n));const inc=n=>{const m=/^(.*)\((\d+)\)\s*$/.exec(n);return m?`${m[1]}(${+m[2]+1})`:n+" (2)";};
  if(L.length)return inc(L[L.length-1]);const first=TRACKS[t].stages[0][0];if(s!==first){const P0=saved.builds[t+"|"+first]||[];if(P0.length)return P0[P0.length-1];}
  for(const k in saved.builds){const X=saved.builds[k];if(X.length)return X[X.length-1];}return "v6.4.1(1)";}
 function askText({title,label,value="",ok="Save",check,allowEmpty}){return new Promise(res=>{const d=document.getElementById("askDlg"),inp=document.getElementById("askInp"),err=document.getElementById("askErr");
@@ -848,11 +870,20 @@ function askText({title,label,value="",ok="Save",check,allowEmpty}){return new P
  const f=document.getElementById("askForm");f.addEventListener("submit",submit);document.getElementById("askCancel").addEventListener("click",cancel);d.addEventListener("cancel",cancel);
  function cleanup(){f.removeEventListener("submit",submit);document.getElementById("askCancel").removeEventListener("click",cancel);d.removeEventListener("cancel",cancel);}
  d.showModal();inp.focus();inp.select();});}
-function newBuild(){const t=saved.view.track;const sk=stageKey();const L0=saved.builds[sk]||[];
- askText({title:"Add new build",label:`Build number for ${TRACKS[t].label} › ${stageLabel()}`,value:guessName(),ok:"Add build",check:n=>L0.includes(n)?"That build already exists in this stage.":null}).then(n=>{if(!n)return;
+// "+ New build" adds a build for the platform in view; in the Both view it asks which.
+function newBuild(){if(P()==="web")return newWebBuild();if(P()==="both"){askChoice({title:"New build",text:"Add a new App build or a new Web build?",yes:"App build",no:"Web build"}).then(v=>{if(v===true)newAppBuild();else if(v===false)newWebBuild();});return;}newAppBuild();}
+// A new build keeps the same Web list: modules put on web in the source build start as "Not started" in the new one.
+function carryWeb(src,dst){if(!src||!dst)return;const store=bstore(dst);ALLROWS.forEach(r=>{if(r.editing||r.uf||r.w0)return;const prev=statusFor(r,src).w;if(!prev)return;const k=r.skey||r.id;store[k]=Object.assign(store[k]||{},{w:resetV(prev)});});}
+function newWebBuild(){const t=saved.view.track;const sk=stageKey();const L0=webList(sk);
+ const last=L0.length?L0[L0.length-1].n:"";const m=/^(.*?)(\d+)(\)?)\s*$/.exec(last);const guess=last?(m?m[1]+(+m[2]+1)+m[3]:last+" (2)"):"1.0";
+ askText({title:"Add new web build",label:`Web build number for ${TRACKS[t].label} › ${stageLabel()}`,value:guess,ok:"Add web build",check:n=>L0.some(x=>x.n===n)?"That web build already exists in this stage.":null}).then(n=>{if(!n)return;
+  const src=webBuild();saved.wbuilds=saved.wbuilds||{};const L=saved.wbuilds[sk]=webList(sk).slice();const k=sk+"|web:"+n;L.push({n,k});saved.bstatus[k]={};carryWeb(src,k);
+  (saved.view.wbuild=saved.view.wbuild||{})[sk]=n;persist();render();});}
+function newAppBuild(){const t=saved.view.track;const sk=stageKey();const L0=saved.builds[sk]||[];
+ askText({title:"Add new build",label:`Build number for ${TRACKS[t].label} › ${stageLabel()}`,value:guessName(),ok:"Add build",check:n=>L0.includes(n)||L0.some(x=>norm(appName(sk+"|"+x))===norm(n))?"That build already exists in this stage.":null}).then(n=>{if(!n)return;
   const tk=saved.view.track;const src=curBuild()||(()=>{const f=tk+"|"+TRACKS[tk].stages[0][0];const X=saved.builds[f]||[];return X.length?f+"|"+X[X.length-1]:null;})();
   const keys=[...new Set(ALLROWS.filter(r=>isFeat(r)&&featVisible(r,src)).map(featKey))];
-  const finish=keep=>{if(keep===null)return;const L=saved.builds[sk]=saved.builds[sk]||[];L.push(n);const nb=sk+"|"+n;saved.view.build[sk]=n;saved.bstatus[nb]={};saved.fvis=saved.fvis||{};saved.fvis[nb]=keep?keys:[];persist();render();};
+  const finish=keep=>{if(keep===null)return;const L=saved.builds[sk]=saved.builds[sk]||[];L.push(n);const nb=sk+"|"+n;saved.view.build[sk]=n;saved.bstatus[nb]={};if(!webSeparate(sk))carryWeb(src,nb);saved.fvis=saved.fvis||{};saved.fvis[nb]=keep?keys:[];persist();render();};
   if(!keys.length){finish(false);return;}
   askChoice({title:"New features & bug fixes",text:`The current build has ${keys.length} new feature${keys.length===1?"":"s"} / bug fix${keys.length===1?"":"es"}. Do you want to keep them in ${n}?`,yes:"Keep them",no:"Remove them"}).then(finish);});}
 function askChoice({title,text,yes,no}){return new Promise(res=>{const d=document.getElementById("chDlg");document.getElementById("chTitle").textContent=title;document.getElementById("chText").textContent=text;
@@ -864,12 +895,40 @@ function renderOverview(){document.getElementById("overview").innerHTML=Object.e
   if(!last)return `<div class="ovl none"><span class="ovs">${sn}</span><span class="ovb">No build yet</span></div>`;
   const s=calcFor(tk+"|"+sk+"|"+last,"both",tk);const pc=s.total?Math.round(s.done/s.total*100):0;
   return `<button class="ovl" data-goto="${esc(tk+"|"+sk+"|"+last)}"><span class="ovs">${sn}</span><span class="ovb">${esc(last)}</span><span class="ovn">${s.done}/${s.total} done</span><span class="ovbar"><span style="width:${pc}%"></span></span></button>`;}).join("")}</div>`).join("");}
+// Build picker for the App builds or the Web builds of the current stage.
+function bldDrop(kind){const sk=stageKey();const web=kind==="web";const sep=webSeparate(sk);
+ // id = stored name (identifies the build), label = name shown
+ const items=web?webList(sk).map(x=>({id:x.n,label:sep?x.n:appName(x.k)})):(saved.builds[sk]||[]).map(n=>({id:n,label:appName(sk+"|"+n)}));
+ const curK=web?webBuild():curBuild();const cur=web&&sep?(webList(sk).find(x=>x.k===curK)||{}).n:(curK?curK.split("|")[2]:"");const cb=(items.find(x=>x.id===cur)||{}).label||"";const open=bldOpen===kind;
+ const label=web?"Web build":(P()==="both"?"App build":"Build");const ic=web?{c:"#3a6fd1",bg:"#e6eefb"}:{c:"#a9601c",bg:"#fbeedf"};const attr=web&&sep?"data-wbld":"data-bld";
+ const ek=web&&sep?"web":"app";// edit/delete act on the web list, or on the App builds while Web shares them
+ const pen=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>`;
+ const bin=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>`;
+ return `<div class="rel"><button class="relbtn" id="${web?"wbldbtn":"bldbtn"}" aria-haspopup="listbox" aria-expanded="${open}"${items.length?"":" disabled"}><span class="relic" style="color:${ic.c};background:${ic.bg}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span><span class="reltx"><small>${label}</small><b>${items.length?esc(cb):"No build yet"}</b></span><svg class="chev" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>${open&&items.length?`<div class="relmenu bldmenu" role="listbox" aria-label="${label}">${[...items].reverse().map((it,i)=>`<div class="bldrow"><button class="relopt" role="option" aria-selected="${it.id===cur}" ${attr}="${esc(it.id)}"><span class="reltx"><b>${esc(it.label)}</b></span>${i===0?`<span class="latest">Latest</span>`:""}${it.id===cur?`<span class="relchk" aria-hidden="true">✓</span>`:`<span class="relchk"></span>`}</button><button type="button" class="bldact" data-bren="${ek}" data-b="${esc(it.id)}" aria-label="Rename build ${esc(it.label)}" title="Rename">${pen}</button><button type="button" class="bldact del" data-bdel="${ek}" data-b="${esc(it.id)}" aria-label="Delete build ${esc(it.label)}" title="Delete">${bin}</button></div>`).join("")}${web&&!sep?`<p class="bldnote">Same numbers as the App builds until you add a web build with “+ New build”.</p>`:""}</div>`:""}</div>`;}
+// Rename only changes the name shown; the build keeps its statuses and notes.
+function renameBuild(kind,id){const sk=stageKey();bldOpen=false;renderBuildbar();
+ if(kind==="web"){const L=saved.wbuilds[sk];const e=L.find(x=>x.n===id);if(!e)return;
+  askText({title:"Rename web build",label:"Web build number",value:e.n,ok:"Save",check:v=>norm(v)!==norm(e.n)&&L.some(x=>norm(x.n)===norm(v))?"That web build already exists in this stage.":null}).then(v=>{if(!v||v===e.n)return;
+   if((saved.view.wbuild||{})[sk]===e.n)saved.view.wbuild[sk]=v;e.n=v;persist();render();});return;}
+ const key=sk+"|"+id;const L=saved.builds[sk]||[];const curN=appName(key);
+ askText({title:"Rename build",label:"Build number",value:curN,ok:"Save",check:v=>norm(v)!==norm(curN)&&L.some(x=>x!==id&&(norm(x)===norm(v)||norm(appName(sk+"|"+x))===norm(v)))?"That build already exists in this stage.":null}).then(v=>{if(!v||v===curN)return;
+  saved.bnames=saved.bnames||{};if(v===id)delete saved.bnames[key];else saved.bnames[key]=v;persist();render();});}
+// Delete a build: it leaves the list, and its statuses and notes are cleared (a new build with the same number starts fresh).
+function deleteBuild(kind,id){const sk=stageKey();bldOpen=false;renderBuildbar();
+ const web=kind==="web";const key=web?((saved.wbuilds[sk]||[]).find(x=>x.n===id)||{}).k:sk+"|"+id;if(!key)return;const nm=web?id:appName(key);
+ const linked=!web&&!webSeparate(sk);
+ askChoice({title:"Delete build",text:`Delete ${web?"web ":""}build ${nm}?${linked?" Web uses the same build numbers, so its web statuses go too.":""} All its statuses and notes are removed. This can’t be undone.`,yes:"Delete build",no:null}).then(ok=>{if(!ok)return;
+  if(web){saved.wbuilds[sk]=saved.wbuilds[sk].filter(x=>x.n!==id);if((saved.view.wbuild||{})[sk]===id)delete saved.view.wbuild[sk];}
+  else{saved.builds[sk]=(saved.builds[sk]||[]).filter(x=>x!==id);if(saved.view.build[sk]===id)delete saved.view.build[sk];if(saved.bnames)delete saved.bnames[key];}
+  if(!allBuilds().includes(key)){const st=key===SEED?saved.status:saved.bstatus[key];if(st)Object.keys(st).forEach(k=>{st[k]={};});
+   Object.keys(saved.notes||{}).forEach(nk=>{if(nk.startsWith(key+"#"))delete saved.notes[nk];});if(saved.fvis)delete saved.fvis[key];}
+  persist();render();});}
 function renderBuildbar(){const t=saved.view.track,s=saved.view.stage[t];const L=saved.builds[stageKey()]||[];const B=curBuild();const cb=B?B.split("|")[2]:"";
  const other=t==="saas"?"vantara":"saas";
  document.getElementById("buildbar").innerHTML=`<h2 class="trk">${TRACKS[t].label}</h2>
  <div class="seg" role="group" aria-label="Stage">${TRACKS[t].stages.map(([k,n])=>`<button class="segb" data-stage="${k}" aria-pressed="${s===k}">${n}</button>`).join("")}</div>
  ${t==="saas"&&s==="prod"?`<div class="rel"><button class="relbtn" id="relbtn" aria-haspopup="listbox" aria-expanded="${relOpen}"><span class="relic" style="color:${SUBI[saved.view.sub].c};background:${SUBI[saved.view.sub].bg}">${SUBI[saved.view.sub].ic}</span><span class="reltx"><small>Release</small><b>${SUBS[saved.view.sub]}</b></span><svg class="chev" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>${relOpen?`<div class="relmenu" role="listbox" aria-label="Production release">${Object.entries(SUBS).map(([k,n])=>`<button class="relopt" role="option" aria-selected="${saved.view.sub===k}" data-sub="${k}"><span class="relic" style="color:${SUBI[k].c};background:${SUBI[k].bg}">${SUBI[k].ic}</span><span class="reltx"><b>${n}</b></span>${saved.view.sub===k?`<span class="relchk" aria-hidden="true">✓</span>`:""}</button>`).join("")}</div>`:""}</div>`:""}
- <div class="rel"><button class="relbtn" id="bldbtn" aria-haspopup="listbox" aria-expanded="${bldOpen}"${L.length?"":" disabled"}><span class="relic" style="color:#a9601c;background:#fbeedf"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span><span class="reltx"><small>Build</small><b>${L.length?esc(cb):"No build yet"}</b></span><svg class="chev" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>${bldOpen&&L.length?`<div class="relmenu bldmenu" role="listbox" aria-label="Build">${[...L].reverse().map((bn,i)=>`<button class="relopt" role="option" aria-selected="${bn===cb}" data-bld="${esc(bn)}"><span class="reltx"><b>${esc(bn)}</b></span>${i===0?`<span class="latest">Latest</span>`:""}${bn===cb?`<span class="relchk" aria-hidden="true">✓</span>`:`<span class="relchk"></span>`}</button>`).join("")}</div>`:""}</div>
+ ${P()==="both"?bldDrop("app")+bldDrop("web"):bldDrop(P()==="web"?"web":"app")}
  <button class="btn sm2" id="newb">+ New build</button><button class="btn sm2 switch" data-track="${other}">Switch to ${TRACKS[other].label} →</button>`;}
 const T_label=t=>TRACKS[t].label;
 function renderModList(){const t=saved.view.track;const off=saved.off[t];document.getElementById("modTitle").textContent=`Modules in ${TRACKS[t].label} build`;
@@ -880,7 +939,11 @@ document.addEventListener("click",e=>{
  const go=e.target.closest("[data-goto]");if(go){const [tk,sk,b]=go.dataset.goto.split("|");saved.view.track=tk;saved.view.stage[tk]=sk;saved.view.build[tk+"|"+sk]=b;persist();render();return;}
  if(e.target.closest("#newb,#newb2")){newBuild();return;}
  if(e.target.closest("#relbtn")){relOpen=!relOpen;bldOpen=false;renderBuildbar();return;}
- if(e.target.closest("#bldbtn")){bldOpen=!bldOpen;relOpen=false;renderBuildbar();return;}
+ if(e.target.closest("#bldbtn")){bldOpen=bldOpen==="app"?false:"app";relOpen=false;renderBuildbar();return;}
+ if(e.target.closest("#wbldbtn")){bldOpen=bldOpen==="web"?false:"web";relOpen=false;renderBuildbar();return;}
+ const bre=e.target.closest("[data-bren]");if(bre){renameBuild(bre.dataset.bren,bre.dataset.b);return;}
+ const bde=e.target.closest("[data-bdel]");if(bde){deleteBuild(bde.dataset.bdel,bde.dataset.b);return;}
+ const wbo=e.target.closest("[data-wbld]");if(wbo){(saved.view.wbuild=saved.view.wbuild||{})[stageKey()]=wbo.dataset.wbld;bldOpen=false;persist();render();return;}
  const bo=e.target.closest("[data-bld]");if(bo){saved.view.build[stageKey()]=bo.dataset.bld;bldOpen=false;persist();render();return;}
  const ro=e.target.closest(".relopt");if(ro){saved.view.sub=ro.dataset.sub;relOpen=false;persist();render();return;}
  if((relOpen||bldOpen)&&!e.target.closest(".rel")){relOpen=false;bldOpen=false;renderBuildbar();}
@@ -889,7 +952,7 @@ document.addEventListener("change",e=>{
   if(e.target.id==="bsel"){saved.view.build[stageKey()]=e.target.value;persist();render();return;}
  const mc=e.target.closest("input[data-mod]");if(mc){const off=saved.off[saved.view.track];if(mc.checked)delete off[mc.dataset.mod];else off[mc.dataset.mod]=true;persist();render();}
 });
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(relOpen||bldOpen)){const id=relOpen?"relbtn":"bldbtn";relOpen=false;bldOpen=false;renderBuildbar();const b=document.getElementById(id);if(b)b.focus();}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(relOpen||bldOpen)){const id=relOpen?"relbtn":bldOpen==="web"?"wbldbtn":"bldbtn";relOpen=false;bldOpen=false;renderBuildbar();const b=document.getElementById(id);if(b)b.focus();}});
 if(ONLINE){
  persist();
  setInterval(()=>{const ae=document.activeElement;if(document.querySelector("dialog[open]")||(ae&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName))||relOpen||bldOpen||dragId||stMenu)return;
