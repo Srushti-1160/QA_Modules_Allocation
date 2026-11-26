@@ -669,7 +669,7 @@ function render(){
  else{const pbtn=p=>`<button data-p="${esc(p.key)}" aria-current="${state.person===p.key}"><b class="snm"><i class="avs" style="${avs(p.key)}">${esc(p.key==="All"?"★":p.name[0])}</i>${esc(p.name)}</b> <span>${listed.filter(r=>r.person===p.key).length}</span></button>`;
   const inGroup=g=>DATA.filter(p=>(p.group||"")===g);
   sd.innerHTML=`<div class="sidehead"><h2>${P()==="app"?"App":P()==="web"?"Web":"App/Web"}</h2><button class="sidetog" aria-label="Close people list" title="Close people list" aria-expanded="true">‹</button></div><button data-p="__all" aria-current="${state.person==="__all"}">Everyone <span>${new Set(listed.filter(r=>!isOther(r.person)).map(r=>norm(r.m))).size}</span></button>`+
-  inGroup("").map(pbtn).join("")+GROUPS.map(g=>{const L=inGroup(g.id);return L.length?`<h2 class="grp">${esc(g.label)}</h2>`+L.map(pbtn).join(""):"";}).join("");}
+  inGroup("").map(pbtn).join("")+(P()==="web"?[]:GROUPS).map(g=>{const L=inGroup(g.id);return L.length?`<h2 class="grp">${esc(g.label)}</h2>`+L.map(pbtn).join(""):"";}).join("");}
  if(!B){document.getElementById("main").innerHTML=`<div class="card empty">No build in ${esc(TRACKS[TK].label)} › ${esc(stageLabel())} yet.<br><button class="btn primary" id="newb2">+ New build</button></div>`;return;}
  const people=[...DATA.filter(p=>!p.group),...GROUPS.flatMap(g=>DATA.filter(p=>p.group===g.id))].filter(p=>state.person==="__all"||p.key===state.person);let otherHead=false,lastGroup="";
  let html="";
@@ -697,7 +697,7 @@ document.addEventListener("click",e=>{
   .then(v=>{if(v!==null)renameRow(r,v);});return;}
  const ns=e.target.closest(".nsend:not(.newsave)");if(ns){submitNote(ns.parentElement.querySelector("input.noteinp"));return;}
  const nb=e.target.closest(".notebtn");if(nb){const k=nb.dataset.note;if(noteEdit.has(k))noteEdit.delete(k);else noteEdit.add(k);render();if(noteEdit.has(k)){const f=document.querySelector(`.card[data-person="${CSS.escape(k)}"] .noteinp`);if(f)f.focus();}return;}
- const sg=e.target.closest(".segb");if(sg){saved.plat=sg.dataset.plat;persist();render();return;}
+ const sg=e.target.closest(".segb");if(sg){saved.plat=sg.dataset.plat;if(P()==="web"&&isOther(state.person))state.person="__all";persist();render();return;}
  const stg=e.target.closest(".sidetog");if(stg){saved.sideClosed=!saved.sideClosed;persist();render();return;}
  const tg=e.target.closest(".tog");if(tg){const id=tg.dataset.tog;if(saved.collapsed[id])delete saved.collapsed[id];else saved.collapsed[id]=true;persist();render();return;}
  const asb=e.target.closest(".addsub");if(asb){addSubRow(asb.dataset.addsub);return;}
