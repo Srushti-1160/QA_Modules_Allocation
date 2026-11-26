@@ -21,9 +21,19 @@ body{background:var(--pagebg,var(--bg));background-color:var(--bg);color:var(--i
 .hero h1{font-size:clamp(28px,4vw,40px);margin:14px 0 6px;letter-spacing:-.02em;font-weight:800;color:#24392c}
 .hero p{margin:0;color:#466052;font-size:17px}
 .scene{display:block;width:100%;height:250px;margin-top:-70px}
-.stats{padding:0 26px;margin-top:-6px;position:relative;z-index:1}
+.stats{padding:0 26px;margin-top:16px;position:relative;z-index:1}
 .srow+.srow{margin-top:16px}
-.slab{font-weight:700;font-size:14px;color:#2f4a3a;margin:0 0 8px 6px}
+.slab{display:flex;align-items:center;gap:12px;margin:0 4px 10px}
+.slab .plat{display:inline-flex;align-items:center;gap:8px;background:#fbf8f3;color:#24392c;border-radius:999px;padding:4px 14px 4px 4px;font-weight:700;font-size:14px;box-shadow:0 1px 0 rgba(60,80,65,.06)}
+.slab .plat i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--sel);color:#fff}
+.slab .psum{font-size:13px;font-weight:600;color:#466052}
+.sc .scn{display:block;font-size:12px;color:var(--muted);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scards{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.sc{min-width:0}
+.side h2.grp{margin:18px 0 8px 10px}
+.grouph{font-size:18px;font-weight:800;color:#24392c;margin:32px 4px 14px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.grouph small{font-size:13px;font-weight:500;color:var(--muted)}
+.layout>*{min-width:0}
 .scards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .sc{background:#fbf8f3;border-radius:22px;padding:18px 22px;box-shadow:0 1px 0 rgba(60,80,65,.05)}
 .sct{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;color:var(--ink)}
@@ -112,6 +122,10 @@ input.noteinp:focus{outline:none;border-color:var(--c-prog)}
 .card h3 .addbtn:hover{background:var(--sel);color:#fff}
 .card h3 .addbtn:focus-visible{outline:2px solid var(--c-prog);outline-offset:2px}
 input.newmod{width:100%;font:inherit;font-weight:600;padding:6px 10px;border-radius:8px;border:1px solid var(--c-prog);background:var(--surface);color:var(--ink)}
+.newcancel{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;display:grid;place-items:center;padding:0;font:inherit;font-size:18px;line-height:1}
+.newcancel:hover{background:var(--c-nd-bg);color:var(--c-nd);border-color:transparent}
+.newcancel:focus-visible{outline:2px solid var(--c-prog);outline-offset:2px}
+input.newmod[aria-invalid="true"]{border-color:var(--c-nd);box-shadow:0 0 0 2px var(--c-nd-bg)}
 .grip{cursor:grab;color:var(--muted);margin-right:8px;user-select:none;font-size:14px;padding:2px 2px;border-radius:4px}
 .grip:hover{color:var(--ink);background:var(--bg)}
 tr.dragging{opacity:.4}
@@ -331,7 +345,7 @@ dialog#chDlg::backdrop{background:rgba(15,35,40,.45)}
 </form>
 </dialog>
 <script>
-const DATA=[{"name":"Sowmya","key":"Sowmya","main":[{"m":"Species Management","a":"In-progress","w":"Not started","t":"Srushti, Sowmya"},{"m":"Taxonomy","a":"","w":"","t":"—","sub":true},{"m":"Animal training","a":"Completed","w":"","t":"Mamatha"},{"m":"Animal training sessions","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Housing","a":"Completed","w":"Not started","t":"Sowmya"},{"m":"Natality","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Edit animal location","a":"Completed","w":"","t":"Sowmya","sub":true,"kind":"feature"},{"m":"Site create/update, site in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Section, section in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Enclosure create/update, enclosure in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Animal insights","a":"Completed","w":"","t":"Sowmya"},{"m":"Animals module","a":"Completed","w":"","t":"Sowmya"},{"m":"Animal create/update, identifiers, animal–staff mapping, observations","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Scan QR","a":"Completed","w":"","t":"Sowmya"},{"m":"Fetal death","a":"Completed","w":"","t":"Sowmya"},{"m":"Fetus details","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Family tree","a":"Completed","w":"","t":"Sowmya"},{"m":"Lineage changes (Animal, Egg, Fetal death, Family tree)","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"},{"m":"Breeding","a":"","w":"","t":"—"}],"mon":[]},{"name":"Mamatha","key":"Mammu","main":[{"m":"LIMS","a":"In-progress","w":"Not started","t":"Mamatha, Keerthana"},{"m":"LIMS Sample Management","a":"In-progress","w":"","t":"Mamatha, Keerthana","sub":true,"kind":"feature"},{"m":"Species knowledge base","a":"","w":"","t":"—"}],"mon":[]},{"name":"Amruth","key":"Amruth","main":[{"m":"Notes","a":"Completed","w":"","t":"Hydar"},{"m":"Note types","a":"","w":"","t":"—","sub":true},{"m":"Notes and note reactions","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Chat","a":"Not started","w":"Not started","t":"—"},{"m":"Focus Hub","a":"In-progress","w":"Not started","t":"Amruth"},{"m":"Tag","a":"Not started","w":"Not started","t":"—"},{"m":"Public tags","a":"","w":"","t":"—","sub":true},{"m":"Tagging notification targets","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"SSO-SAAS","a":"In-progress","w":"Not started","t":"Hydar, Amruth"},{"m":"Login Username to be prefilled","a":"Completed","w":"","t":"Srushti, Sowmya","sub":true,"kind":"feature"},{"m":"Asset Management","a":"","w":"","t":"—"},{"m":"Asset tickets","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Attendance","a":"","w":"","t":"—"}],"mon":[]},{"name":"Srushti","key":"Srushti","main":[{"m":"Species Management","a":"In-progress","w":"Not started","t":"Srushti, Sowmya"},{"m":"Taxonomy","a":"","w":"","t":"—","sub":true},{"m":"Missing Animal","a":"Completed","w":"","t":"Sowmya"},{"m":"Announcements","a":"Completed","w":"","t":"Srushti"},{"m":"Announcement 48hrs post disappear","a":"In-progress","w":"","t":"Srushti","sub":true,"kind":"feature"},{"m":"Announcements","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Housing","a":"Completed","w":"Not started","t":"Sowmya"},{"m":"Natality","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Edit animal location","a":"Completed","w":"","t":"Sowmya","sub":true,"kind":"feature"},{"m":"Site create/update, site in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Section, section in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Enclosure create/update, enclosure in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Food wastage","a":"In-progress","w":"","t":"Srushti"},{"m":"Food wastage","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Users","a":"In-progress","w":"Not started","t":"Sowmya"},{"m":"Add ID proofs","a":"","w":"","t":"—","sub":true},{"m":"Education type","a":"","w":"","t":"—","sub":true},{"m":"Institute masters","a":"","w":"","t":"—","sub":true},{"m":"Organisation","a":"","w":"","t":"—","sub":true},{"m":"Edit institute details","a":"Completed","w":"","t":"Shambhavi","sub":true,"kind":"feature"},{"m":"Media","a":"In-progress","w":"Not started","t":"Hydar"},{"m":"Breeding","a":"","w":"","t":"—"},{"m":"Accommodation","a":"","w":"","t":"—"},{"m":"Vehicle Mgt system","a":"","w":"","t":"—"}],"mon":[{"m":"Mortality and Necropsy","a":"In-progress","w":"Not started","t":"Sowmya"},{"m":"Necropsy center","a":"","w":"Not started","t":"—","sub":true},{"m":"Mortality","a":"","w":"Not started","t":"—","sub":true,"kind":"report"},{"m":"Mortality and Necropsy tab (Species Management)","a":"","w":"","t":"—","sub":true,"kind":"tab"},{"m":"Mortality records and mortality media","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Necropsy","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Carcass transfers","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Animal transfer","a":"Completed","w":"","t":"Shambhavi"},{"m":"Inter-site transfer in","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"External transfer","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"In-house transfer","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"New arrivals","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Approvals","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Egg","a":"Completed","w":"Not started","t":"Narendra"},{"m":"Medical","a":"Not started","w":"Not developed","t":"—"},{"m":"Medical masters","a":"","w":"Not started","t":"—","sub":true},{"m":"Medical records, prescriptions, administer, complaints, advices, lab","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Medical – Single Animal","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Batch Medical and group medical","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Direct prescription and direct administer","a":"Completed","w":"","t":"Srushti","sub":true,"kind":"part"},{"m":"Administration Module","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Handling Pending Administration in Home page","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Hospital","a":"In-progress","w":"Not started","t":"Srushti, Shambhavi"},{"m":"Hospital","a":"","w":"","t":"—","sub":true},{"m":"Hospital management","a":"In-progress","w":"","t":"Srushti, Shambhavi","sub":true,"kind":"feature"},{"m":"Improved Hospital Module Navigation","a":"Completed","w":"","t":"Srushti","sub":true,"kind":"feature"},{"m":"Hospital transfers","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Vaccination","a":"In-progress","w":"","t":"Narendra"},{"m":"Vaccination stop","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Pharmacy","a":"Completed","w":"","t":"Dhanush"},{"m":"Pharmacy Invoices","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"}]},{"name":"Keerthana","key":"Keerthi","main":[{"m":"Inventory","a":"","w":"","t":"—"},{"m":"Kitchen and Diet","a":"","w":"","t":"—"}],"mon":[]},{"name":"Dhanush","key":"Dhanush","main":[{"m":"Audit","a":"Completed","w":"","t":"Sowmya"},{"m":"Help Desk","a":"Completed","w":"","t":"Dhanush"},{"m":"Departments","a":"","w":"","t":"—","sub":true},{"m":"Request approvers","a":"","w":"","t":"—","sub":true},{"m":"Vendors","a":"","w":"","t":"—","sub":true},{"m":"Requests and request comments","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Assessment","a":"Completed","w":"","t":"Dhanush"},{"m":"Animal assessment","a":"Completed","w":"","t":"Dhanush","sub":true},{"m":"Housing assessment","a":"","w":"","t":"—","sub":true},{"m":"Assessment tab (Species Management)","a":"","w":"","t":"—","sub":true,"kind":"tab"},{"m":"Batch Assessment","a":"Completed","w":"","t":"Dhanush","sub":true,"kind":"part"},{"m":"Pharmacy","a":"Completed","w":"","t":"Dhanush"},{"m":"Pharmacy Invoices","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"},{"m":"Smart Bluetooth Device","a":"Completed","w":"","t":"Dhanush"},{"m":"Task management","a":"","w":"","t":"—"},{"m":"Task comments","a":"","w":"","t":"—","sub":true,"kind":"notif"}],"mon":[]},{"name":"Hydar","key":"Hydar","main":[{"m":"Procurement","a":"","w":"","t":"—"}],"mon":[]},{"name":"Shambhavi","key":"Shambhavi","main":[{"m":"Mortality and Necropsy","a":"In-progress","w":"Not started","t":"Sowmya"},{"m":"Necropsy center","a":"","w":"Not started","t":"—","sub":true},{"m":"Mortality","a":"","w":"Not started","t":"—","sub":true,"kind":"report"},{"m":"Mortality and Necropsy tab (Species Management)","a":"","w":"","t":"—","sub":true,"kind":"tab"},{"m":"Mortality records and mortality media","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Necropsy","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Carcass transfers","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Animal transfer","a":"Completed","w":"","t":"Shambhavi"},{"m":"Inter-site transfer in","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"External transfer","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"In-house transfer","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"New arrivals","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Approvals","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Security Module (Animal transfer)","a":"No need to test","w":"","t":"—","sub":true,"kind":"part"},{"m":"Hospital","a":"In-progress","w":"Not started","t":"Srushti, Shambhavi"},{"m":"Hospital","a":"","w":"","t":"—","sub":true},{"m":"Hospital management","a":"In-progress","w":"","t":"Srushti, Shambhavi","sub":true,"kind":"feature"},{"m":"Improved Hospital Module Navigation","a":"Completed","w":"","t":"Srushti","sub":true,"kind":"feature"},{"m":"Hospital transfers","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Hospital transfer","a":"Completed","w":"","t":"Shambhavi","sub":true,"kind":"part"},{"m":"Security Module (Hospital transfer)","a":"No need to test","w":"","t":"—","sub":true,"kind":"part"},{"m":"Pharmacy","a":"Completed","w":"","t":"Dhanush"},{"m":"Pharmacy Invoices","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"}],"mon":[]},{"name":"Narendra","key":"Narendra","main":[{"m":"Egg","a":"Completed","w":"Not started","t":"Narendra"},{"m":"Security Module","a":"No need to test","w":"","t":"—","sub":true,"kind":"part"},{"m":"Medical","a":"Not started","w":"Not developed","t":"—"},{"m":"Medical masters","a":"","w":"Not started","t":"—","sub":true},{"m":"Medical records, prescriptions, administer, complaints, advices, lab","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Medical – Single Animal","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Batch Medical and group medical","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Direct prescription and direct administer","a":"Completed","w":"","t":"Srushti","sub":true,"kind":"part"},{"m":"Administration Module","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Handling Pending Administration in Home page","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Vaccination","a":"In-progress","w":"","t":"Narendra"},{"m":"Vaccination stop","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Deworming","a":"Completed","w":"","t":"Narendra"},{"m":"Deworming stop","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Pharmacy","a":"Completed","w":"","t":"Dhanush"},{"m":"Pharmacy Invoices","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"},{"m":"Supplements","a":"Completed","w":"","t":"Narendra"}],"mon":[]},{"name":"All (everyone tests)","key":"All","main":[{"m":"Dashboard","a":"","w":"Not started","t":"—"},{"m":"Reports","a":"In-progress","w":"Not started","t":"All"},{"m":"Key Insights","a":"In-progress","w":"","t":"All"},{"m":"Home page","a":"In-progress","w":"","t":"Sowmya"},{"m":"Home screen changes","a":"In-progress","w":"","t":"Sowmya","sub":true,"kind":"feature"},{"m":"Recently Used Modules","a":"Completed","w":"","t":"Sowmya","sub":true,"kind":"feature"},{"m":"Journal","a":"Not started","w":"","t":"—"},{"m":"Masters","a":"In-progress","w":"Not started","t":"All"},{"m":"Permissions","a":"","w":"","t":"—"},{"m":"Role","a":"","w":"","t":"—","sub":true},{"m":"In-app Notifications","a":"","w":"","t":"—"},{"m":"Localization","a":"","w":"","t":"—"},{"m":"Visitor management","a":"","w":"Not started","t":"—"},{"m":"Settings","a":"","w":"Not started","t":"—"}],"mon":[]}];
+const DATA=[{"name":"Sowmya","key":"Sowmya","main":[{"m":"Species Management","a":"In-progress","w":"Not started","t":"Srushti, Sowmya"},{"m":"Taxonomy","a":"","w":"","t":"—","sub":true},{"m":"Animal training","a":"Completed","w":"","t":"Mamatha"},{"m":"Animal training sessions","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Housing","a":"Completed","w":"Not started","t":"Sowmya"},{"m":"Natality","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Edit animal location","a":"Completed","w":"","t":"Sowmya","sub":true,"kind":"feature"},{"m":"Site create/update, site in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Section, section in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Enclosure create/update, enclosure in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Animal insights","a":"Completed","w":"","t":"Sowmya"},{"m":"Animals module","a":"Completed","w":"","t":"Sowmya"},{"m":"Animal create/update, identifiers, animal–staff mapping, observations","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Scan QR","a":"Completed","w":"","t":"Sowmya"},{"m":"Fetal death","a":"Completed","w":"","t":"Sowmya"},{"m":"Fetus details","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Family tree","a":"Completed","w":"","t":"Sowmya"},{"m":"Lineage changes (Animal, Egg, Fetal death, Family tree)","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"},{"m":"Breeding","a":"","w":"","t":"—"}],"mon":[]},{"name":"Mamatha","key":"Mammu","main":[{"m":"LIMS","a":"In-progress","w":"Not started","t":"Mamatha, Keerthana"},{"m":"LIMS Sample Management","a":"In-progress","w":"","t":"Mamatha, Keerthana","sub":true,"kind":"feature"},{"m":"Species knowledge base","a":"","w":"","t":"—"}],"mon":[]},{"name":"Amruth","key":"Amruth","main":[{"m":"Notes","a":"Completed","w":"","t":"Hydar"},{"m":"Note types","a":"","w":"","t":"—","sub":true},{"m":"Notes and note reactions","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Chat","a":"Not started","w":"Not started","t":"—"},{"m":"Focus Hub","a":"In-progress","w":"Not started","t":"Amruth"},{"m":"Tag","a":"Not started","w":"Not started","t":"—"},{"m":"Public tags","a":"","w":"","t":"—","sub":true},{"m":"Tagging notification targets","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"SSO-SAAS","a":"In-progress","w":"Not started","t":"Hydar, Amruth"},{"m":"Login Username to be prefilled","a":"Completed","w":"","t":"Srushti, Sowmya","sub":true,"kind":"feature"},{"m":"Asset Management","a":"","w":"","t":"—"},{"m":"Asset tickets","a":"","w":"","t":"—","sub":true,"kind":"notif"}],"mon":[]},{"name":"Srushti","key":"Srushti","main":[{"m":"Species Management","a":"In-progress","w":"Not started","t":"Srushti, Sowmya"},{"m":"Taxonomy","a":"","w":"","t":"—","sub":true},{"m":"Missing Animal","a":"Completed","w":"","t":"Sowmya"},{"m":"Announcements","a":"Completed","w":"","t":"Srushti"},{"m":"Announcement 48hrs post disappear","a":"In-progress","w":"","t":"Srushti","sub":true,"kind":"feature"},{"m":"Announcements","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Housing","a":"Completed","w":"Not started","t":"Sowmya"},{"m":"Natality","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Edit animal location","a":"Completed","w":"","t":"Sowmya","sub":true,"kind":"feature"},{"m":"Site create/update, site in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Section, section in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Enclosure create/update, enclosure in-charge","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Food wastage","a":"In-progress","w":"","t":"Srushti"},{"m":"Food wastage","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Users","a":"In-progress","w":"Not started","t":"Sowmya"},{"m":"Add ID proofs","a":"","w":"","t":"—","sub":true},{"m":"Education type","a":"","w":"","t":"—","sub":true},{"m":"Institute masters","a":"","w":"","t":"—","sub":true},{"m":"Organisation","a":"","w":"","t":"—","sub":true},{"m":"Edit institute details","a":"Completed","w":"","t":"Shambhavi","sub":true,"kind":"feature"},{"m":"Media","a":"In-progress","w":"Not started","t":"Hydar"},{"m":"Breeding","a":"","w":"","t":"—"},{"m":"Accommodation","a":"","w":"","t":"—"},{"m":"Vehicle Mgt system","a":"","w":"","t":"—"}],"mon":[{"m":"Mortality and Necropsy","a":"In-progress","w":"Not started","t":"Sowmya"},{"m":"Necropsy center","a":"","w":"Not started","t":"—","sub":true},{"m":"Mortality","a":"","w":"Not started","t":"—","sub":true,"kind":"report"},{"m":"Mortality and Necropsy tab (Species Management)","a":"","w":"","t":"—","sub":true,"kind":"tab"},{"m":"Mortality records and mortality media","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Necropsy","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Carcass transfers","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Animal transfer","a":"Completed","w":"","t":"Shambhavi"},{"m":"Inter-site transfer in","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"External transfer","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"In-house transfer","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"New arrivals","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Approvals","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Egg","a":"Completed","w":"Not started","t":"Narendra"},{"m":"Medical","a":"Not started","w":"Not developed","t":"—"},{"m":"Medical masters","a":"","w":"Not started","t":"—","sub":true},{"m":"Medical records, prescriptions, administer, complaints, advices, lab","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Medical – Single Animal","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Batch Medical and group medical","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Direct prescription and direct administer","a":"Completed","w":"","t":"Srushti","sub":true,"kind":"part"},{"m":"Administration Module","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Handling Pending Administration in Home page","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Hospital","a":"In-progress","w":"Not started","t":"Srushti, Shambhavi"},{"m":"Hospital","a":"","w":"","t":"—","sub":true},{"m":"Hospital management","a":"In-progress","w":"","t":"Srushti, Shambhavi","sub":true,"kind":"feature"},{"m":"Improved Hospital Module Navigation","a":"Completed","w":"","t":"Srushti","sub":true,"kind":"feature"},{"m":"Hospital transfers","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Vaccination","a":"In-progress","w":"","t":"Narendra"},{"m":"Vaccination stop","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Pharmacy","a":"Completed","w":"","t":"Dhanush"},{"m":"Pharmacy Invoices","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"}]},{"name":"Keerthana","key":"Keerthi","main":[{"m":"Inventory","a":"","w":"","t":"—"},{"m":"Kitchen and Diet","a":"","w":"","t":"—"}],"mon":[],"group":"diet"},{"name":"Dhanush","key":"Dhanush","main":[{"m":"Audit","a":"Completed","w":"","t":"Sowmya"},{"m":"Help Desk","a":"Completed","w":"","t":"Dhanush"},{"m":"Departments","a":"","w":"","t":"—","sub":true},{"m":"Request approvers","a":"","w":"","t":"—","sub":true},{"m":"Vendors","a":"","w":"","t":"—","sub":true},{"m":"Requests and request comments","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Assessment","a":"Completed","w":"","t":"Dhanush"},{"m":"Animal assessment","a":"Completed","w":"","t":"Dhanush","sub":true},{"m":"Housing assessment","a":"","w":"","t":"—","sub":true},{"m":"Assessment tab (Species Management)","a":"","w":"","t":"—","sub":true,"kind":"tab"},{"m":"Batch Assessment","a":"Completed","w":"","t":"Dhanush","sub":true,"kind":"part"},{"m":"Pharmacy","a":"Completed","w":"","t":"Dhanush"},{"m":"Pharmacy Invoices","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"},{"m":"Smart Bluetooth Device","a":"Completed","w":"","t":"Dhanush"},{"m":"Task management","a":"","w":"","t":"—"},{"m":"Task comments","a":"","w":"","t":"—","sub":true,"kind":"notif"}],"mon":[]},{"name":"Hydar","key":"Hydar","main":[{"m":"Procurement","a":"","w":"","t":"—"}],"mon":[],"group":"diet"},{"name":"Shambhavi","key":"Shambhavi","main":[{"m":"Mortality and Necropsy","a":"In-progress","w":"Not started","t":"Sowmya"},{"m":"Necropsy center","a":"","w":"Not started","t":"—","sub":true},{"m":"Mortality","a":"","w":"Not started","t":"—","sub":true,"kind":"report"},{"m":"Mortality and Necropsy tab (Species Management)","a":"","w":"","t":"—","sub":true,"kind":"tab"},{"m":"Mortality records and mortality media","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Necropsy","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Carcass transfers","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Animal transfer","a":"Completed","w":"","t":"Shambhavi"},{"m":"Inter-site transfer in","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"External transfer","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"In-house transfer","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"New arrivals","a":"","w":"","t":"—","sub":true,"kind":"report"},{"m":"Approvals","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Security Module (Animal transfer)","a":"No need to test","w":"","t":"—","sub":true,"kind":"part"},{"m":"Hospital","a":"In-progress","w":"Not started","t":"Srushti, Shambhavi"},{"m":"Hospital","a":"","w":"","t":"—","sub":true},{"m":"Hospital management","a":"In-progress","w":"","t":"Srushti, Shambhavi","sub":true,"kind":"feature"},{"m":"Improved Hospital Module Navigation","a":"Completed","w":"","t":"Srushti","sub":true,"kind":"feature"},{"m":"Hospital transfers","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Hospital transfer","a":"Completed","w":"","t":"Shambhavi","sub":true,"kind":"part"},{"m":"Security Module (Hospital transfer)","a":"No need to test","w":"","t":"—","sub":true,"kind":"part"},{"m":"Pharmacy","a":"Completed","w":"","t":"Dhanush"},{"m":"Pharmacy Invoices","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"}],"mon":[]},{"name":"Narendra","key":"Narendra","main":[{"m":"Egg","a":"Completed","w":"Not started","t":"Narendra"},{"m":"Security Module","a":"No need to test","w":"","t":"—","sub":true,"kind":"part"},{"m":"Medical","a":"Not started","w":"Not developed","t":"—"},{"m":"Medical masters","a":"","w":"Not started","t":"—","sub":true},{"m":"Medical records, prescriptions, administer, complaints, advices, lab","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Medical – Single Animal","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Batch Medical and group medical","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Direct prescription and direct administer","a":"Completed","w":"","t":"Srushti","sub":true,"kind":"part"},{"m":"Administration Module","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Handling Pending Administration in Home page","a":"Not started","w":"","t":"—","sub":true,"kind":"part"},{"m":"Vaccination","a":"In-progress","w":"","t":"Narendra"},{"m":"Vaccination stop","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Deworming","a":"Completed","w":"","t":"Narendra"},{"m":"Deworming stop","a":"","w":"","t":"—","sub":true,"kind":"notif"},{"m":"Pharmacy","a":"Completed","w":"","t":"Dhanush"},{"m":"Pharmacy Invoices","a":"Not started","w":"","t":"—","sub":true,"kind":"feature"},{"m":"Supplements","a":"Completed","w":"","t":"Narendra"}],"mon":[]},{"name":"All (everyone tests)","key":"All","main":[{"m":"Dashboard","a":"","w":"Not started","t":"—","only":"web"},{"m":"Reports","a":"In-progress","w":"Not started","t":"All"},{"m":"Key Insights","a":"In-progress","w":"","t":"All"},{"m":"Home page","a":"In-progress","w":"","t":"Sowmya"},{"m":"Home screen changes","a":"In-progress","w":"","t":"Sowmya","sub":true,"kind":"feature"},{"m":"Recently Used Modules","a":"Completed","w":"","t":"Sowmya","sub":true,"kind":"feature"},{"m":"Journal","a":"Not started","w":"","t":"—"},{"m":"Masters","a":"In-progress","w":"Not started","t":"All"},{"m":"Permissions","a":"","w":"","t":"—"},{"m":"Role","a":"","w":"","t":"—","sub":true},{"m":"In-app Notifications","a":"","w":"","t":"—"},{"m":"Localization","a":"","w":"","t":"—"},{"m":"Visitor management","a":"","w":"Not started","t":"—","only":"web"},{"m":"Settings","a":"","w":"Not started","t":"—","only":"web"}],"mon":[]},{"name":"Amruth","key":"Attendance","group":"attendance","main":[{"m":"Attendance","a":"","w":"","t":"—"}],"mon":[],"avKey":"Amruth"}];
 const SEED_UNMATCHED=[{id:"seed1",m:"Switch Zoo",a:"Not started",t:"—"},{id:"seed2",m:"Select All Bulk Actions",a:"Completed",t:"Sowmya"}];
 const BASE=["Completed","In-progress","Pending","Not started","Not enabled","Not developed","No need to test"];
 const COL={"Completed":"done","In-progress":"prog","Pending":"pend","Not started":"ns","Not enabled":"ne","Not developed":"nd","No need to test":"nn"};
@@ -339,7 +353,7 @@ const KEY="uat-6410-alloc-v1";
 const SERVER=/*__STATE__*/null;
 const ONLINE=!!SERVER;
 const UI_KEYS=["collapsed","view","plat","sideClosed","off"];
-const SHARED_DOC=["builds","custom","added","layout","nest","features","unmatched","seeded","fvis","names","removed"];
+const SHARED_DOC=["builds","custom","added","layout","nest","features","unmatched","seeded","fvis","names","removed","synced"];
 let saved={status:{},custom:[],added:{},collapsed:{},features:[],unmatched:[],seeded:false};
 try{const v=localStorage.getItem(KEY);if(v){const o=JSON.parse(v);if(ONLINE){UI_KEYS.forEach(k=>{if(o[k]!==undefined)saved[k]=o[k];});}else saved=Object.assign(saved,o);}}catch(e){}
 if(ONLINE){Object.assign(saved,SERVER.doc||{});saved.status=SERVER.status||{};saved.bstatus=SERVER.bstatus||{};saved.notes=SERVER.notes||{};}
@@ -389,12 +403,21 @@ if(!saved.seeded){saved.unmatched=[...SEED_UNMATCHED,...saved.unmatched];saved.s
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const norm=s=>String(s||"").trim().toLowerCase();
 const ALLROWS=[];
-DATA.forEach(p=>(saved.added[p.key]||[]).forEach(x=>p.main.push({id:x.id,m:x.m,a:"",w:x.w||"",t:""})));
+DATA.forEach(p=>(saved.added[p.key]||[]).forEach(x=>p.main.push({id:x.id,m:x.m,a:"",w:x.w||"",t:"",only:x.only||(x.w?"web":undefined),notIn:x.notIn})));
 DATA.forEach(p=>["main","mon"].forEach(sec=>p[sec].forEach(r=>{
  r.id=r.id||(p.key+"|"+sec+"|"+(r.sub?(r.kind==="feature"?"feature:":r.kind==="tab"?"tab:":r.kind==="notif"?"notif:":r.kind==="part"?"part:":"master:"):"")+r.m);r.person=p.key;r.sec=sec;
  r.a0=r.a||"";r.w0=r.w||"";r.t0=r.t||"";r.m0=r.m;ALLROWS.push(r);})));
 // Rows the team removed stay removed.
-if(saved.removed&&saved.removed.length){const gone=new Set(saved.removed);DATA.forEach(p=>["main","mon"].forEach(sec=>{p[sec]=p[sec].filter(r=>!gone.has(r.id));}));for(let i=ALLROWS.length-1;i>=0;i--)if(gone.has(ALLROWS[i].id))ALLROWS.splice(i,1);}
+/* ---------- Build history: each build keeps its own rows and notes ---------- */
+// Every build that exists, as "track|stage|build".
+const allBuilds=()=>Object.entries(saved.builds||{}).flatMap(([sk,L])=>(L||[]).map(n=>sk+"|"+n));
+// Removed rows stay in the builds that existed when they were removed (saved.removed: {id, keep:[builds]}; a plain id = removed from every build).
+function applyRemoved(){const keep=new Map();(saved.removed||[]).forEach(x=>{if(typeof x==="string")keep.set(x,[]);else if(x&&x.id)keep.set(x.id,x.keep||[]);});
+ ALLROWS.forEach(r=>{if(keep.has(r.id))r.onlyIn=keep.get(r.id);else delete r.onlyIn;});}
+const hiddenIn=(r,B)=>!!B&&((!!r.onlyIn&&!r.onlyIn.includes(B))||(!!r.notIn&&r.notIn.includes(B)));
+// Notes used to be shared by all builds: give every existing build its own copy once.
+{const legacy=Object.keys(saved.notes||{}).filter(k=>!k.includes("#"));if(legacy.length){const bs=allBuilds();
+ legacy.forEach(k=>{bs.forEach(b=>{const nk=b+"#"+k;if(saved.notes[nk]===undefined)saved.notes[nk]=saved.notes[k];});delete saved.notes[k];});persist();}}
 {const SH=["Sowmya","Srushti"];const paths=k=>{const p=DATA.find(x=>x.key===k);const m=new Map();let par="";p.main.forEach(r=>{if(!r.sub)par=norm(r.m);const pth=r.sub?par+"|"+(r.kind||"master")+":"+norm(r.m):par;if(!m.has(pth))m.set(pth,r);});return m;};
  const A=paths(SH[0]),B=paths(SH[1]);
  A.forEach((ra,pth)=>{const rb=B.get(pth);if(!rb)return;const sk="ss:"+pth;
@@ -413,11 +436,77 @@ function insertFeatures(){
    for(let i=0;i<L.length;i++){const r=L[i];if(r.sub||r.editing||norm(r.m)!==norm(f.module))continue;
     let j=i+1;while(j<L.length&&L[j].sub)j++;
     const row={id:`uf:${f.id}:${p.key}:${sec}`,skey:sk,a0:f.a||"",w0:"",t0:f.t||"",m:f.m,a:st.a!==undefined?st.a:(f.a||""),w:st.w!==undefined?st.w:"",t:f.t||"",sub:true,kind:f.type==="bug"?"bug":"feature",uf:true,person:p.key,sec};
-    L.splice(j,0,row);ALLROWS.push(row);i=j;}}));});}
+    L.splice(j,0,row);ALLROWS.push(row);i=j;}}));});applyRemoved();}
 function removeFeatures(){DATA.forEach(p=>["main","mon"].forEach(sec=>{p[sec]=p[sec].filter(r=>!r.uf);}));for(let i=ALLROWS.length-1;i>=0;i--)if(ALLROWS[i].uf)ALLROWS.splice(i,1);}
 (saved.nest?Object.entries(saved.nest):[]).forEach(([id,v])=>{const r=ALLROWS.find(x=>x.id===id);if(r){r.sub=!!v.sub;r.kind=v.kind||undefined;}});
 DATA.forEach(p=>["main","mon"].forEach(sec=>{let seen=false;p[sec].forEach(r=>{if(!r.sub)seen=true;else if(!seen)r.sub=false;});}));
 insertFeatures();reorderByLayout();
+/* ---------- One-time App status update from the "UAT v6.4.1(10)" sheet (APP: New + Existing features) ---------- */
+// top: module row, sub: [parent, item], any: an item with this name anywhere (new features, not-matched items).
+const SHEET_SYNC={id:"sheet-uat-6.4.1(10)-app-2026-11-26",rows:[
+ // New features
+ [{any:"LIMS Sample Management"},"In-progress"],
+ [{any:"Hospital management"},"Completed"],
+ [{any:"Lineage changes (Animal, Egg, Fetal death, Family tree)"},"In-progress"],
+ [{any:"Switch Zoo"},"Completed"],
+ [{any:"Home screen changes"},"Completed"],
+ [{any:"Edit institute details"},"Completed"],
+ [{any:"Edit animal location"},"Completed"],
+ [{any:"Recently Used Modules"},"Completed"],
+ [{any:"Improved Hospital Module Navigation"},"Completed"],
+ [{any:"Select All Bulk Actions"},"Completed"],
+ [{any:"Announcement 48hrs post disappear"},"In-progress"],
+ [{any:"Login Username to be prefilled"},"Completed"],
+ // Existing features
+ [{top:"SSO-SAAS"},"In-progress"],
+ [{top:"Housing"},"Completed"],
+ [{any:"Direct prescription and direct administer"},"Completed"],
+ [{sub:["Assessment","Animal assessment"]},"Completed"],
+ [{sub:["Assessment","Housing assessment"]},"Completed"],
+ [{top:"Assessment"},"Completed"],
+ [{sub:["Assessment","Batch Assessment"]},"Completed"],
+ [{top:"Help Desk"},"Completed"],
+ [{top:"Pharmacy"},"Completed"],
+ [{sub:["Housing","Natality"]},"Completed"],
+ [{top:"Animal insights"},"Completed"],
+ [{sub:["Mortality and Necropsy","Mortality"]},"Completed"],
+ [{sub:["Food wastage","Food wastage"]},"Completed"],
+ [{top:"Egg"},"Completed"],
+ [{top:"Mortality and Necropsy"},"Completed"],
+ [{top:"Animals module"},"Completed"],
+ [{top:"Species Management"},"Completed"],
+ [{top:"Users"},"Completed"],
+ [{top:"Missing Animal"},"Completed"],
+ [{top:"Animal transfer"},"Completed"],
+ [{top:"Scan QR"},"Completed"],
+ [{top:"Media"},"Completed"],
+ [{top:"Masters"},"In-progress"],
+ [{top:"Vaccination"},"Completed"],
+ [{top:"Deworming"},"Completed"],
+ [{top:"Supplements"},"Completed"],
+ [{top:"Fetal death"},"Completed"],
+ [{top:"Family tree"},"Completed"],
+ [{top:"Food wastage"},"Completed"],
+ [{sub:["Hospital","Hospital transfer"]},"Completed"],
+ [{top:"Announcements"},"Completed"],
+ [{top:"Notes"},"Completed"],
+ [{top:"Focus Hub"},"Completed"],
+ [{top:"Audit"},"Completed"],
+ [{top:"Chat"},"Completed"],
+ [{top:"Animal training"},"Completed"],
+ [{top:"Smart Bluetooth Device"},"Completed"],
+ [{top:"Tag"},"Completed"],
+ [{sub:["Egg","Security Module"]},"No need to test"],
+ [{sub:["Animal transfer","Security Module (Animal transfer)"]},"No need to test"],
+ [{sub:["Hospital","Security Module (Hospital transfer)"]},"No need to test"]
+]};
+function sheetRows(spec){const out=[];DATA.forEach(p=>["main","mon"].forEach(sec=>{let par="";p[sec].forEach(r=>{if(!r.sub)par=r.m0||r.m;const nm=norm(r.m0||r.m);
+ if(spec.any?nm===norm(spec.any):spec.top?(!r.sub&&nm===norm(spec.top)):(r.sub&&norm(par)===norm(spec.sub[0])&&nm===norm(spec.sub[1])))out.push(r);});}));return out;}
+function applySheetSync(){saved.synced=saved.synced||[];if(saved.synced.includes(SHEET_SYNC.id))return;
+ SHEET_SYNC.rows.forEach(([spec,a])=>{sheetRows(spec).forEach(r=>{const k=r.skey||r.id;saved.status[k]=Object.assign(saved.status[k]||{},{a});});
+  if(spec.any)saved.unmatched.forEach(u=>{if(norm(u.m)===norm(spec.any))u.a=a;});});
+ saved.synced.push(SHEET_SYNC.id);persist();}
+applySheetSync();
 function reorderByLayout(){if(!saved.layout)return;DATA.forEach(p=>{const L=saved.layout[p.key];if(!L)return;["main","mon"].forEach(sec=>{const ids=L[sec]||[];if(!ids.some(id=>id.startsWith("uf:")))return;const arr=p[sec];const pos=new Map(ids.map((id,i)=>[id,i]));
  const placed=arr.filter(r=>pos.has(r.id)).sort((a,b)=>pos.get(a.id)-pos.get(b.id));const out=[...placed];
  arr.forEach((r,i)=>{if(pos.has(r.id))return;let prev=null;for(let k=i-1;k>=0;k--){if(out.includes(arr[k])){prev=arr[k];break;}}const at=prev?out.indexOf(prev)+1:0;let j=at;while(prev&&!r.sub&&out[j]&&out[j].sub)j++;out.splice(j,0,r);});
@@ -438,43 +527,46 @@ function moveRow(id,toKey,toSec,beforeId,mode){const r=ALLROWS.find(x=>x.id===id
 let state={person:"__all",status:null,q:""};
 const P=()=>saved.plat||"both";
 const AVC=[["#e0782a","#fff"],["#a51d4a","#fff"],["#3f5e4b","#fff"],["#d9a23a","#2b2112"],["#5f8fb0","#fff"],["#7b5ea8","#fff"],["#3f9a52","#fff"],["#c4643f","#fff"],["#2f7f7a","#fff"],["#6f7a72","#fff"]];
-const avs=k=>{const i=Math.max(0,DATA.findIndex(p=>p.key===k))%AVC.length;return `background:${AVC[i][0]};color:${AVC[i][1]}`;};
+const avs=k=>{const ak=(DATA.find(p=>p.key===k)||{}).avKey||k;const i=Math.max(0,DATA.findIndex(p=>p.key===ak))%AVC.length;return `background:${AVC[i][0]};color:${AVC[i][1]}`;};
 const vals=(r,pl)=>pl==="app"?[r.a]:pl==="web"?[r.w]:[r.a,r.w];
 const onPlat=r=>P()==="both"||!!vals(r,P())[0];
 const statuses=()=>[...BASE,...saved.custom];
 const cssVars=s=>{const k=COL[s]||"x";return `color:var(--c-${k});background-color:var(--c-${k}-bg)`;};
 saved.notes=saved.notes||{};const noteEdit=new Set();
-const nkey=r=>r.id;const noteOf=r=>saved.notes[nkey(r)]||"";
+const nkey=r=>(curBuild()||"")+"#"+r.id;const noteOf=r=>saved.notes[nkey(r)]||"";
 // The Web view has no "Tested by" column, so tester names are not searched there.
 const hay=r=>(P()==="web"?[r.m,r.w,noteOf(r)]:[r.m,r.t,r.a,r.w,noteOf(r)]).join(" ").toLowerCase();
-function statusFor(r,B){const st=((B===SEED?saved.status:saved.bstatus[B])||{})[r.skey||r.id]||{};const a0=B===SEED?r.a0:resetV(r.a0),w0=B===SEED?r.w0:resetV(r.w0);return {a:st.a!==undefined?st.a:(a0||""),w:st.w!==undefined?st.w:(w0||""),t:st.t!==undefined?st.t:(B===SEED?(r.t0||""):"")};}
+// A module (not its sub-items) with no App status counts as "Not started". Web-only modules have no App status.
+const defA=(r,a)=>a||(r.sub||r.only==="web"?"":"Not started");
+function statusFor(r,B){const st=((B===SEED?saved.status:saved.bstatus[B])||{})[r.skey||r.id]||{};const a0=B===SEED?r.a0:resetV(r.a0),w0=B===SEED?r.w0:resetV(r.w0);return {a:defA(r,st.a!==undefined?st.a:(a0||"")),w:st.w!==undefined?st.w:(w0||""),t:st.t!==undefined?st.t:(B===SEED?(r.t0||""):"")};}
 function applyBuild(){const B=curBuild();ALLROWS.forEach(r=>{if(r.editing)return;const s=B?statusFor(r,B):{a:"",w:"",t:""};r.a=s.a;r.w=s.w;r.t=s.t;});}
 const isFeat=r=>r.kind==="feature"||r.kind==="bug";
 const featKey=r=>r.uf?r.skey:"sf:"+norm(r.m0||r.m);
 function parentName(r){if(!r.sub)return "";const arr=DATA.find(p=>p.key===r.person)[r.sec];for(let i=arr.indexOf(r)-1;i>=0;i--)if(!arr[i].sub)return arr[i].m;return "";}
 // Rename a row everywhere the same item appears (the same module can be listed under several people).
 // The same item listed under several people (same name, level, kind and parent).
-function sameRows(r){const par=norm(parentName(r));return ALLROWS.filter(x=>!x.editing&&norm(x.m)===norm(r.m)&&!!x.sub===!!r.sub&&(!r.sub||((x.kind||"")===(r.kind||"")&&norm(parentName(x))===par)));}
+// A row someone added by hand belongs to that person and list only.
+const isAdded=r=>String(r.id).startsWith("added:");
+function sameRows(r){if(isAdded(r))return [r];const par=norm(parentName(r));return ALLROWS.filter(x=>!x.editing&&!x.off&&!isAdded(x)&&(x.only||"")===(r.only||"")&&norm(x.m)===norm(r.m)&&!!x.sub===!!r.sub&&(!r.sub||((x.kind||"")===(r.kind||"")&&norm(parentName(x))===par)));}
 // Remove rows for good: a module takes its items with it.
 // dropFeatures: also delete new-feature / bug-fix records (only when no copy of their module is left).
-function removeRows(rows,dropFeatures){const drop=new Set();
+// Remove rows from the current build (and builds added later). Builds that already exist keep them, with their statuses and notes.
+function removeRows(rows){const B=curBuild();if(!B)return;const drop=new Set();
  rows.forEach(r=>{drop.add(r);if(!r.sub){const arr=DATA.find(p=>p.key===r.person)[r.sec];for(let j=arr.indexOf(r)+1;arr[j]&&arr[j].sub;j++)drop.add(arr[j]);}});
- saved.removed=saved.removed||[];const featIds=new Set();
- drop.forEach(x=>{if(x.uf){if(dropFeatures){const f=saved.features.find(f=>"uf:"+f.id===x.skey);if(f)featIds.add(f.id);}return;}
-  if(!saved.removed.includes(x.id))saved.removed.push(x.id);
-  if(String(x.id).startsWith("added:")&&saved.added[x.person])saved.added[x.person]=saved.added[x.person].filter(a=>a.id!==x.id);
-  delete saved.notes[x.id];delete saved.collapsed[x.id];});
- if(featIds.size)saved.features=saved.features.filter(f=>!featIds.has(f.id));
- DATA.forEach(p=>["main","mon"].forEach(sec=>{p[sec]=p[sec].filter(x=>!drop.has(x)&&!(x.uf&&featIds.has(x.skey.slice(3))));}));
- for(let i=ALLROWS.length-1;i>=0;i--){const x=ALLROWS[i];if(drop.has(x)||(x.uf&&featIds.has(x.skey.slice(3))))ALLROWS.splice(i,1);}
- saveLayout();render();}
+ saved.removed=saved.removed||[];const others=allBuilds().filter(b=>b!==B);
+ drop.forEach(x=>{if(hiddenIn(x,B))return;const i=saved.removed.findIndex(e=>e===x.id||(e&&e.id===x.id));
+  const keep=(x.onlyIn||others).filter(b=>b!==B&&!(x.notIn||[]).includes(b));
+  if(i>=0)saved.removed[i]={id:x.id,keep};else saved.removed.push({id:x.id,keep});x.onlyIn=keep;});
+ persist();render();}
 function askRemove(r){const all=sameRows(r);const others=[...new Set(all.filter(x=>x.person!==r.person).map(x=>DATA.find(p=>p.key===x.person).name))];
  const arr=DATA.find(p=>p.key===r.person)[r.sec];let kids=0;if(!r.sub)for(let j=arr.indexOf(r)+1;arr[j]&&arr[j].sub;j++)kids++;
  const me=DATA.find(p=>p.key===r.person).name;
  const what=`“${r.m}”`+(kids?` and the ${kids} ${kids===1?"item":"items"} under it`:"");
  const shared=r.uf;// a new feature / bug fix is one record shown under every copy of its module
- if(!others.length||shared){askChoice({title:r.sub?"Remove item":"Remove module",text:`Remove ${what}${others.length?` (also listed under ${others.join(", ")})`:""}? Its statuses and notes go with it. This can’t be undone.`,yes:"Remove",no:null}).then(v=>{if(v)removeRows(shared?all:[r],true);});return;}
- askChoice({title:r.sub?"Remove item":"Remove module",text:`Remove ${what}? It is also listed under ${others.join(", ")}. This can’t be undone.`,yes:"Remove everywhere",no:`Only from ${me}`}).then(v=>{if(v===null)return;removeRows(v?all:[r],v);});}
+ const bname=(curBuild()||"").split("|")[2]||"this build";const olds=allBuilds().filter(b=>b!==curBuild()).length;
+ const note=` It is removed from ${bname} and from builds you add later.${olds?" Builds that already exist keep it, with their statuses and notes.":""}`;
+ if(!others.length||shared){askChoice({title:r.sub?"Remove item":"Remove module",text:`Remove ${what}${others.length?` (also listed under ${others.join(", ")})`:""}?${note}`,yes:"Remove",no:null}).then(v=>{if(v)removeRows(shared?all:[r]);});return;}
+ askChoice({title:r.sub?"Remove item":"Remove module",text:`Remove ${what}? It is also listed under ${others.join(", ")}.${note}`,yes:"Remove everywhere",no:`Only from ${me}`}).then(v=>{if(v===null)return;removeRows(v?all:[r]);});}
 function renameRow(r,v){const old=r.m;if(!v||v===old)return;
  const same=sameRows(r);
  saved.names=saved.names||{};
@@ -483,12 +575,16 @@ function renameRow(r,v){const old=r.m;if(!v||v===old)return;
  if(!r.sub)saved.features.forEach(f=>{if(norm(f.module)===norm(old))f.module=v;});
  persist();render();}
 function featVisible(r,B){if(!B)return true;const L=(saved.fvis||{})[B];if(L)return L.includes(featKey(r));if(r.uf){const f=saved.features.find(x=>"uf:"+x.id===r.skey);return !f||!f.build||f.build===B;}return true;}
-function markOff(track,B){const off={};DATA.forEach(p=>["main","mon"].forEach(sec=>{let par=null;p[sec].forEach(r=>{if(!r.sub)par=norm(r.m);r.off=!!off[par]||(isFeat(r)&&!!B&&!featVisible(r,B));});}));}
-function calcFor(B,pl,track){markOff(track,B);const g=new Map(),out=new Set();
- DATA.forEach(p=>["main","mon"].forEach(sec=>{let cur=null;p[sec].forEach(r=>{if(r.editing||r.off)return;const s=statusFor(r,B);const f=(pl==="app"?[s.a]:pl==="web"?[s.w]:[s.a,s.w]).filter(Boolean);
-  if(!r.sub){cur=null;if(!f.length)return;const k=norm(r.m);if(f.some(x=>EXC.includes(x))){out.add(k);return;}cur=k;if(!g.has(k))g.set(k,true);if(!f.every(x=>x==="Completed"))g.set(k,false);}
+// off = not part of build B (removed/added in another build, or a new feature not kept in B). A hidden module hides its items.
+function markOff(track,B){DATA.forEach(p=>["main","mon"].forEach(sec=>{let parOff=false;p[sec].forEach(r=>{if(!r.sub)parOff=hiddenIn(r,B);
+ r.off=(r.sub&&parOff)||hiddenIn(r,B)||(isFeat(r)&&!!B&&!featVisible(r,B));});}));}
+// Total = distinct modules (a module listed under several people counts once), leaving out No need to test / Not developed / Not enabled.
+function calcFor(B,pl,track){markOff(track,B);const g=new Map(),out=new Map();
+ // Monitoring sections are not counted (only modules people own and test).
+DATA.filter(p=>!p.group).forEach(p=>["main"].forEach(sec=>{let cur=null;p[sec].forEach(r=>{if(r.editing||r.off)return;const s=statusFor(r,B);const f=(pl==="app"?[s.a]:pl==="web"?[s.w]:[s.a,s.w]).filter(Boolean);
+  if(!r.sub){cur=null;if(!f.length)return;const k=norm(r.m);if(f.some(x=>EXC.includes(x))){if(!out.has(k))out.set(k,{m:r.m,s:f.find(x=>EXC.includes(x))});return;}cur=k;if(!g.has(k))g.set(k,true);if(!f.every(x=>x==="Completed"))g.set(k,false);}
   else if(cur&&f.length&&!f.some(x=>EXC.includes(x))&&!f.every(x=>x==="Completed"))g.set(cur,false);});}));
- out.forEach(k=>g.delete(k));let c=0;g.forEach(x=>{if(x)c++;});markOff(saved.view.track,curBuild());return {total:g.size,done:c,pend:g.size-c};}
+ out.forEach((v,k)=>g.delete(k));let c=0;g.forEach(x=>{if(x)c++;});markOff(saved.view.track,curBuild());return {total:g.size,done:c,pend:g.size-c,out:[...out.values()]};}
 // On web = has a Web status, or (for a module) one of its sub-items does.
 function onWeb(r){if(r.w)return true;if(r.sub)return false;const arr=DATA.find(p=>p.key===r.person)[r.sec];
  for(let j=arr.indexOf(r)+1;arr[j]&&arr[j].sub;j++)if(arr[j].w&&!arr[j].off)return true;return false;}
@@ -496,12 +592,13 @@ function match(r){
  if(r.editing)return true;
  if(r.off)return false;
  if(P()==="web"&&!onWeb(r))return false;
+ if(P()==="app"&&r.only==="web")return false;
  if(state.status&&!vals(r,P()).includes(state.status))return false;
  if(state.q&&!hay(r).includes(state.q.toLowerCase()))return false;
  return true;}
 function moduleNames(){const s=new Map();DATA.forEach(p=>["main","mon"].forEach(sec=>p[sec].forEach(r=>{if(!r.sub&&!r.editing&&r.m){const k=norm(r.m);if(!s.has(k))s.set(k,{name:r.m,people:new Set()});s.get(k).people.add(p.key==="All"?"All":p.key);}})));
  return [...s.values()].sort((a,b)=>a.name.localeCompare(b.name));}
-function selectHTML(r,f){const v=r[f];
+function selectHTML(r,f){const v=r[f];if(f==="a"&&r.only==="web")return `<span class="tbadd" title="Web only">Web only</span>`;
  return `<button type="button" class="stbtn${v?" has":""}" data-id="${esc(r.id)}" data-f="${f}" aria-haspopup="listbox" aria-expanded="false" aria-label="${f==="a"?"App":"Web"} status for ${esc(r.m)}: ${esc(v||"not set")}" style="${v?cssVars(v):""}">${v?`<i></i>${esc(v)}`:"Select"}<svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>`;}
 /* ---------- Status dropdown ---------- */
 let stMenu=null;
@@ -531,16 +628,18 @@ document.addEventListener("keydown",e=>{if(!stMenu)return;const items=[...stMenu
 window.addEventListener("scroll",e=>{if(stMenu&&e.target!==stMenu.m)closeStMenu();},true);
 window.addEventListener("resize",()=>closeStMenu());
 const TAG={part:"",notif:`<span class="mtag ntag">Notification</span>`,tab:`<span class="mtag ttag">Tab</span>`,report:`<span class="mtag rtag">Report</span>`,feature:`<span class="mtag ftag">New feature</span>`,bug:`<span class="mtag btag">Bug fix</span>`};
-function tableHTML(rows,pk){let par=null;const out=[];const showA=P()!=="web",showW=P()!=="app",showT=P()!=="web";const ed=noteEdit.has(pk);const showN=ed||rows.some(r=>noteOf(r));
+// "Tested by" only matters when someone other than the module's owner tested it.
+function otherTester(r,pk){const p=DATA.find(x=>x.key===pk)||{};const own=new Set([norm(p.name),norm(p.key)]);const names=String(r.t||"").split(",").map(x=>x.trim()).filter(x=>x&&x!=="—");return names.some(n=>!own.has(norm(n)));}
+function tableHTML(rows,pk){let par=null;const out=[];const showA=P()!=="web",showW=P()!=="app",showT=P()!=="web"&&rows.some(r=>!r.editing&&otherTester(r,pk));const ed=noteEdit.has(pk);const showN=ed||rows.some(r=>noteOf(r));
  rows.forEach((r,i)=>{if(!r.sub)par=r;const nx=rows[i+1];const has=!r.sub&&nx&&nx.sub;
   if(r.sub&&par&&saved.collapsed[par.id])return;
   const shut=has&&saved.collapsed[r.id];
   const cls=r.sub?("subrow"+(nx&&nx.sub?"":" last")):(has&&!shut?"hassub":"");
   const tog=has?`<button class="tog" data-tog="${esc(r.id)}" aria-expanded="${!shut}" aria-label="${shut?"Show":"Hide"} items under ${esc(r.m)}" title="${shut?"Show":"Hide"}">${shut?"▸":"▾"}</button>`:"";
-  out.push(`<tr class="${cls}" data-id="${esc(r.id)}" data-person="${esc(r.person)}" data-sec="${r.sec}"><td class="mod">${r.editing?`<div class="nwrap"><input class="newmod" data-id="${esc(r.id)}" ${r.sub?"":`placeholder="Module name" `}aria-label="${r.sub?`New item under ${esc(parentName(r))}`:"Module name"}"><button type="button" class="nsend newsave" aria-label="Save" title="Save"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:`<span class="grip" draggable="true" data-drag="${esc(r.id)}" title="Drag to another person" aria-hidden="true">⠿</span>`+(r.sub?((r.kind in TAG)?TAG[r.kind]:`<span class="mtag">Master</span>`):"")+esc(r.m)+`<button type="button" class="mren" data-ren="${esc(r.id)}" aria-label="Rename ${esc(r.m)}" title="Rename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>`+(r.sub?"":`<button type="button" class="addsub" data-addsub="${esc(r.id)}" aria-label="Add under ${esc(r.m)}" title="Add under ${esc(r.m)}">+</button>`)+`<button type="button" class="mren mdel" data-del="${esc(r.id)}" aria-label="Remove ${esc(r.m)}" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg></button>`+tog}</td>${showA?`<td class="st">${selectHTML(r,"a")}</td>`:""}${showW?`<td class="st">${selectHTML(r,"w")}</td>`:""}${showT?`<td class="tb">${r.editing?"":`<button type="button" class="tbedit" data-tb="${esc(r.id)}" aria-label="Edit tested by for ${esc(r.m)}" title="Edit tested by">${r.t&&r.t!=="—"?esc(r.t):`<span class="tbadd">Add name</span>`}</button>`}</td>`:""}${showN?`<td class="nt">${ed&&!r.editing?`<div class="nwrap"><input class="noteinp" data-nid="${esc(nkey(r))}" value="${esc(noteOf(r))}" placeholder="Add a note" aria-label="Note for ${esc(r.m)}"><button class="nsend" aria-label="Save note for ${esc(r.m)}" title="Save note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:esc(noteOf(r))}</td>`:""}</tr>`);});
+  out.push(`<tr class="${cls}" data-id="${esc(r.id)}" data-person="${esc(r.person)}" data-sec="${r.sec}"><td class="mod">${r.editing?`<div class="nwrap"><input class="newmod" data-id="${esc(r.id)}" ${r.sub?"":`placeholder="Module name" `}aria-label="${r.sub?`New item under ${esc(parentName(r))}`:"Module name"}"><button type="button" class="nsend newsave" aria-label="Save" title="Save"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button><button type="button" class="newcancel" aria-label="Cancel" title="Cancel">×</button></div>`:`<span class="grip" draggable="true" data-drag="${esc(r.id)}" title="Drag to another person" aria-hidden="true">⠿</span>`+(r.sub?((r.kind in TAG)?TAG[r.kind]:`<span class="mtag">Master</span>`):"")+esc(r.m)+`<button type="button" class="mren" data-ren="${esc(r.id)}" aria-label="Rename ${esc(r.m)}" title="Rename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>`+(r.sub?"":`<button type="button" class="addsub" data-addsub="${esc(r.id)}" aria-label="Add under ${esc(r.m)}" title="Add under ${esc(r.m)}">+</button>`)+`<button type="button" class="mren mdel" data-del="${esc(r.id)}" aria-label="Remove ${esc(r.m)}" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg></button>`+tog}</td>${showA?`<td class="st">${selectHTML(r,"a")}</td>`:""}${showW?`<td class="st">${selectHTML(r,"w")}</td>`:""}${showT?`<td class="tb">${!r.editing&&otherTester(r,pk)?`<button type="button" class="tbedit" data-tb="${esc(r.id)}" aria-label="Edit tested by for ${esc(r.m)}" title="Edit tested by">${esc(r.t)}</button>`:""}</td>`:""}${showN?`<td class="nt">${ed&&!r.editing?`<div class="nwrap"><input class="noteinp" data-nid="${esc(nkey(r))}" value="${esc(noteOf(r))}" placeholder="Add a note" aria-label="Note for ${esc(r.m)}"><button class="nsend" aria-label="Save note for ${esc(r.m)}" title="Save note"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg></button></div>`:esc(noteOf(r))}</td>`:""}</tr>`);});
  return `<div class="tbl"><table><thead><tr><th>Module</th>${showA?"<th>App status</th>":""}${showW?"<th>Web status</th>":""}${showT?"<th>Tested by</th>":""}${showN?"<th>Notes</th>":""}</tr></thead><tbody>${out.join("")}</tbody></table></div>`;}
-function cnt(m,mo){const a=[...m,...mo].filter(onPlat);const c=k=>a.filter(r=>r.sub&&(k==="master"?!r.kind:r.kind===k)).length;const w=(n,one,many)=>n?`, ${n} ${n===1?one:many}`:"";const mods=a.filter(r=>!r.sub).length;
- return `${mods} ${mods===1?"module":"modules"}`+w(c("master"),"master","masters")+w(c("report"),"report","reports")+w(c("feature"),"new feature","new features")+w(c("bug"),"bug fix","bug fixes")+w(c("tab"),"tab","tabs")+w(c("notif"),"notification","notifications");}
+// Card header: main modules only (items under a module are not counted).
+function cnt(m,mo){const n=m.filter(r=>!r.sub&&!r.editing).length;return `${n} ${n===1?"module":"modules"}`;}
 // Unmatched items only carry an App status, so they are not part of the Web view.
 function unmatchedHTML(){if(!saved.unmatched.length||state.person!=="__all"||P()==="web")return "";
  const mods=moduleNames();
@@ -555,25 +654,32 @@ function render(){
  document.getElementById("crumb").textContent=`${TRACKS[TK].label} › ${stageLabel()}`+(B?` › ${B.split("|")[2]}`:"");
  {const pls=P()==="both"?["app","web"]:[P()];
   document.getElementById("stats").innerHTML=!B?`<div class="sc nob">No build in this stage yet. Use “+ New build” to add one.</div>`:pls.map(pl=>{const s=calcFor(B,pl,TK);const pc=s.total?Math.round(s.done/s.total*100):0;
-   return `<div class="srow"><div class="slab">${pl==="app"?"App":"Web"}</div><div class="scards"><div class="sc"><span class="sct"><i style="background:#e0782a"></i>Total modules</span><b>${s.total}</b><div class="bar"><span style="width:100%;background:#f0c79c"></span></div></div><div class="sc"><span class="sct"><i style="background:#3f9a52"></i>Completed <em class="pc">${pc}%</em></span><b>${s.done}</b><div class="bar"><span style="width:${pc}%;background:#5fae6e"></span></div></div><div class="sc"><span class="sct"><i style="background:#a51d4a"></i>Pending</span><b>${s.pend}</b><div class="bar"><span style="width:${s.total?100-pc:0}%;background:#d98aa2"></span></div></div></div></div>`;}).join("");}
+   const ic=pl==="app"?`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>`:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`;
+   const left=s.out.length?`${s.out.length} left out: ${s.out.map(o=>`${o.m} (${o.s})`).join(", ")}`:"Each module counted once";
+   return `<div class="srow"><div class="slab"><span class="plat"><i>${ic}</i>${pl==="app"?"App":"Web"}</span><span class="psum">${s.done} of ${s.total} completed</span></div><div class="scards"><div class="sc"><span class="sct"><i style="background:#e0782a"></i>Total modules</span><b>${s.total}</b><div class="bar"><span style="width:100%;background:#f0c79c"></span></div><small class="scn" title="${esc(left)}">${esc(left)}</small></div><div class="sc"><span class="sct"><i style="background:#3f9a52"></i>Completed <em class="pc">${pc}%</em></span><b>${s.done}</b><div class="bar"><span style="width:${pc}%;background:#5fae6e"></span></div></div><div class="sc"><span class="sct"><i style="background:#a51d4a"></i>Pending</span><b>${s.pend}</b><div class="bar"><span style="width:${s.total?100-pc:0}%;background:#d98aa2"></span></div></div></div></div>`;}).join("");}
  renderBuildbar();
  const base=ALLROWS.filter(r=>!r.off&&onPlat(r)&&(!state.q||hay(r).includes(state.q.toLowerCase())));
  document.getElementById("pills").innerHTML=`<button class="pill all" aria-pressed="${!state.status}" data-s="">All <em>${base.length}</em></button>`+
   statuses().map(s=>{const n=base.filter(r=>vals(r,P()).includes(s)).length;const k=COL[s]||"x";
    return `<button class="pill" style="color:var(--c-${k})" aria-pressed="${state.status===s}" data-s="${esc(s)}"><i></i>${esc(s)} <em>${n}</em></button>`;}).join("")+`<div class="seg" role="group" aria-label="Show platform">${[["app","App"],["web","Web"],["both","Both"]].map(([k,l])=>`<button class="segb" data-plat="${k}" aria-pressed="${P()===k}">${l}</button>`).join("")}</div>`;
+ // Sidebar counts: every module in the person's list for this view, whatever its status (status filter and search ignored).
+ const listed=ALLROWS.filter(r=>!r.sub&&!r.editing&&!r.off&&r.sec!=="mon"&&(P()==="web"?onWeb(r):P()==="app"?r.only!=="web":true));
  const sd=document.getElementById("side"),lay=document.querySelector(".layout");lay.classList.toggle("closed",!!saved.sideClosed);
  if(saved.sideClosed){sd.innerHTML=`<button class="sidetog" aria-label="Open people list" title="Open people list" aria-expanded="false">›</button>`;}
- else sd.innerHTML=`<div class="sidehead"><h2>People</h2><button class="sidetog" aria-label="Close people list" title="Close people list" aria-expanded="true">‹</button></div><button data-p="__all" aria-current="${state.person==="__all"}">Everyone <span>${new Set(vis.filter(r=>!r.sub&&!r.editing).map(r=>norm(r.m))).size}</span></button>`+
-  DATA.map(p=>`<button data-p="${esc(p.key)}" aria-current="${state.person===p.key}"><b class="snm"><i class="avs" style="${avs(p.key)}">${esc(p.key==="All"?"★":p.name[0])}</i>${esc(p.name)}</b> <span>${vis.filter(r=>r.person===p.key&&!r.sub&&!r.editing).length}</span></button>`).join("");
+ else{const pbtn=p=>`<button data-p="${esc(p.key)}" aria-current="${state.person===p.key}"><b class="snm"><i class="avs" style="${avs(p.key)}">${esc(p.key==="All"?"★":p.name[0])}</i>${esc(p.name)}</b> <span>${listed.filter(r=>r.person===p.key).length}</span></button>`;
+  const inGroup=g=>DATA.filter(p=>(p.group||"")===g);
+  sd.innerHTML=`<div class="sidehead"><h2>ANTZ app</h2><button class="sidetog" aria-label="Close people list" title="Close people list" aria-expanded="true">‹</button></div><button data-p="__all" aria-current="${state.person==="__all"}">Everyone <span>${new Set(listed.filter(r=>!isOther(r.person)).map(r=>norm(r.m))).size}</span></button>`+
+  inGroup("").map(pbtn).join("")+GROUPS.map(g=>{const L=inGroup(g.id);return L.length?`<h2 class="grp">${esc(g.label)}</h2>`+L.map(pbtn).join(""):"";}).join("");}
  if(!B){document.getElementById("main").innerHTML=`<div class="card empty">No build in ${esc(TRACKS[TK].label)} › ${esc(stageLabel())} yet.<br><button class="btn primary" id="newb2">+ New build</button></div>`;return;}
- const people=DATA.filter(p=>state.person==="__all"||p.key===state.person);
+ const people=[...DATA.filter(p=>!p.group),...GROUPS.flatMap(g=>DATA.filter(p=>p.group===g.id))].filter(p=>state.person==="__all"||p.key===state.person);let otherHead=false,lastGroup="";
  let html="";
  people.forEach(p=>{const m=p.main.filter(match),mo=p.mon.filter(match);if(!m.length&&!mo.length&&(state.q||state.status))return;
+  if(p.group&&state.person==="__all"&&p.group!==lastGroup){if(!otherHead){otherHead=true;html+=unmatchedHTML();}lastGroup=p.group;html+=`<h2 class="grouph">${esc(GROUPS.find(g=>g.id===p.group).label)} <small>Not counted in the ANTZ app totals</small></h2>`;}
   html+=`<section class="card" data-person="${esc(p.key)}"><h3><span class="av" style="${avs(p.key)}">${esc(p.key==="All"?"★":p.name[0])}</span><span class="pname">${esc(p.name)}</span> <small>${cnt(m,mo)}</small><span class="hbtns"><button class="notebtn" data-note="${esc(p.key)}" aria-pressed="${noteEdit.has(p.key)}" aria-label="${noteEdit.has(p.key)?"Done adding notes":"Add notes"} for ${esc(p.name)}" title="${noteEdit.has(p.key)?"Done":"Add notes"}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="addbtn" data-add="${esc(p.key)}" aria-label="Add row for ${esc(p.name)}" title="Add row">+</button></span></h3>`;
   if(m.length)html+=tableHTML(m,p.key);else if(!mo.length)html+=`<p class="none">No modules yet.</p>`;
-  if(mo.length)html+=`<h4><span class="ic">M</span>Monitoring <small style="color:var(--muted);font-weight:500">${mo.length}</small></h4>`+tableHTML(mo,p.key);
+  if(mo.length)html+=`<h4><span class="ic">M</span>Monitoring <small style="color:var(--muted);font-weight:500">${mo.filter(r=>!r.sub&&!r.editing).length}</small></h4>`+tableHTML(mo,p.key);
   html+=`</section>`;});
- html+=unmatchedHTML();
+ if(!otherHead)html+=unmatchedHTML();
  document.getElementById("main").innerHTML=html||`<div class="card empty">No modules match. Clear the search or pick another status.</div>`;
 }
 document.addEventListener("click",e=>{
@@ -594,7 +700,7 @@ document.addEventListener("click",e=>{
  const tg=e.target.closest(".tog");if(tg){const id=tg.dataset.tog;if(saved.collapsed[id])delete saved.collapsed[id];else saved.collapsed[id]=true;persist();render();return;}
  const asb=e.target.closest(".addsub");if(asb){addSubRow(asb.dataset.addsub);return;}
  const ab=e.target.closest(".addbtn");if(ab){const key=ab.dataset.add;const p=DATA.find(x=>x.key===key);
-  const r={id:"added:"+key+":"+Date.now(),m:"",a:"",w:newWeb(),t:"",person:key,sec:"main",editing:true};p.main.push(r);ALLROWS.push(r);render();
+  const r={id:"added:"+key+":"+Date.now(),m:"",a:"",w:newWeb(),only:newOnly(),t:"",person:key,sec:"main",editing:true};p.main.push(r);ALLROWS.push(r);render();
   const inp=document.querySelector(`input.newmod[data-id="${r.id}"]`);if(inp)inp.focus();return;}
  const pl=e.target.closest(".pill");if(pl){state.status=pl.dataset.s||null;render();return;}
  const sb=e.target.closest(".side button[data-p]");if(sb){state.person=sb.dataset.p;render();return;}
@@ -618,20 +724,36 @@ document.addEventListener("dragend",()=>{dragId=null;clearOver();document.queryS
 // Add an editable sub-module row directly under a module (after its existing children).
 function addSubRow(parentId){const par=ALLROWS.find(x=>x.id===parentId);if(!par||par.sub)return;const arr=DATA.find(p=>p.key===par.person)[par.sec];
  let j=arr.indexOf(par)+1;while(arr[j]&&arr[j].sub)j++;
- const r={id:"added:"+par.person+":"+Date.now(),m:"",a:"",w:newWeb(),t:"",person:par.person,sec:par.sec,sub:true,kind:"part",editing:true};
+ const r={id:"added:"+par.person+":"+Date.now(),m:"",a:"",w:newWeb(),only:newOnly(),t:"",person:par.person,sec:par.sec,sub:true,kind:"part",editing:true};
  arr.splice(j,0,r);ALLROWS.push(r);if(saved.collapsed[par.id]){delete saved.collapsed[par.id];persist();}render();
  const inp=document.querySelector(`input.newmod[data-id="${r.id}"]`);if(inp)inp.focus();}
 // Rows added while the Web view is showing start on web, otherwise the web filter would hide them straight away.
 const newWeb=()=>P()==="web"?"Not started":"";
-function finish(inp,keep){const r=ALLROWS.find(x=>x.id===inp.dataset.id);if(!r||!r.editing)return;const v=inp.value.trim();
+// App and Web lists are separate: anything added in the Web view is web-only and never shows in the App view.
+const newOnly=()=>P()==="web"?"web":undefined;
+// An existing row with the same name in the same list (a module for this person, or an item under the same module).
+// Keerthana, Hydar and Attendance are tracked separately from the ANTZ app (not in its totals).
+const isOther=k=>!!(DATA.find(p=>p.key===k)||{}).group;
+// Groups shown after the ANTZ app people, each under its own heading.
+const GROUPS=[{id:"diet",label:"Diet and Kitchen"},{id:"attendance",label:"Attendance"}];
+const onPlatView=r=>P()==="web"?onWeb(r):P()==="app"?r.only!=="web":true;
+function dupOf(r,v){const par=r.sub?norm(parentName(r)):"";return ALLROWS.find(x=>x!==r&&!x.editing&&!x.off&&x.person===r.person&&onPlatView(x)&&!!x.sub===!!r.sub&&norm(x.m)===norm(v)&&(!r.sub||(x.sec===r.sec&&norm(parentName(x))===par)));}
+function finish(inp,keep,blur){const r=ALLROWS.find(x=>x.id===inp.dataset.id);if(!r||!r.editing)return;const v=inp.value.trim();
  const p=DATA.find(x=>x.key===r.person);
- if(keep&&v){r.m=v;r.m0=v;r.a0="";r.w0=r.w||"";r.t0="";delete r.editing;if(r.sub)setNest(r,true);const rec={id:r.id,m:v};if(r.w)rec.w=r.w;(saved.added[r.person]=saved.added[r.person]||[]).push(rec);persist();saveLayout();}
+ const dup=keep&&v&&dupOf(r,v);
+ if(dup){const who=p.name;const hidden=!match(dup);const list=P()==="web"?"web":P()==="app"?"app":"";
+  const msg=`“${dup.m}” is already ${r.sub?`under ${parentName(r)}`:`in ${who}’s ${list?list+" ":""}list`}${hidden?" (hidden by the current filter or search).":"."}`;
+  if(!blur){showSync(msg,true);inp.setAttribute("aria-invalid","true");inp.title=msg;inp.focus();inp.select();return;}
+  keep=false;showSync(msg,true);}
+ if(keep&&v){r.m=v;r.m0=v;r.a0="";r.w0=r.w||"";r.t0="";delete r.editing;if(r.sub)setNest(r,true);const rec={id:r.id,m:v};if(r.w)rec.w=r.w;if(r.only)rec.only=r.only;{const B=curBuild();const old=allBuilds().filter(b=>b!==B);if(old.length){rec.notIn=old;r.notIn=old;}}(saved.added[r.person]=saved.added[r.person]||[]).push(rec);persist();saveLayout();}
  else{const L=p[r.sec];L.splice(L.indexOf(r),1);ALLROWS.splice(ALLROWS.indexOf(r),1);}
  render();}
 document.getElementById("main").addEventListener("keydown",e=>{const i=e.target.closest("input.newmod");if(!i)return;
  if(e.key==="Enter"){e.preventDefault();finish(i,true);}else if(e.key==="Escape"){finish(i,false);}});
-document.getElementById("main").addEventListener("focusout",e=>{const i=e.target.closest("input.newmod");if(!i)return;if(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest(".newsave"))return;setTimeout(()=>finish(i,true),0);});
+document.getElementById("main").addEventListener("focusout",e=>{const i=e.target.closest("input.newmod");if(!i)return;if(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest(".newsave"))return;setTimeout(()=>finish(i,true,true),0);});
 document.getElementById("main").addEventListener("click",e=>{const b=e.target.closest(".newsave");if(!b)return;const i=b.parentElement.querySelector("input.newmod");if(!i)return;if(i.value.trim())finish(i,true);else i.focus();});
+document.getElementById("main").addEventListener("mousedown",e=>{if(e.target.closest(".newcancel,.newsave"))e.preventDefault();});
+document.getElementById("main").addEventListener("click",e=>{const b=e.target.closest(".newcancel");if(!b)return;const i=b.parentElement.querySelector("input.newmod");if(i)finish(i,false);});
 function submitNote(inp){const v=inp.value.trim();if(v)saved.notes[inp.dataset.nid]=v;else delete saved.notes[inp.dataset.nid];persist();const c=inp.closest(".card");if(c)noteEdit.delete(c.dataset.person);render();}
 document.getElementById("main").addEventListener("keydown",e=>{const n=e.target.closest("input.noteinp");if(n&&e.key==="Enter"){e.preventDefault();submitNote(n);}});
 document.getElementById("q").addEventListener("input",e=>{state.q=e.target.value.trim();render();});
